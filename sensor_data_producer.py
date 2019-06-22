@@ -16,8 +16,6 @@ import tensorflow as tf
 
 def main(**kwargs):
 
-    # print(FLAGS.config_file_path)
-
     with open(FLAGS.config_file_path, 'r') as f:
 
         # Read the base config file which randomizes over other properties.
@@ -27,6 +25,10 @@ def main(**kwargs):
 
     # Generate a new config file randomly selecting from an FPA config.
     for sensor_num in range(FLAGS.num_sensors):
+
+        sim_dict = config_dict['sim']
+        sim_dict["samples"] = FLAGS.num_samples
+        config_dict['sim'] = sim_dict
 
         fpa_dict = config_dict['fpa']
 
@@ -94,12 +96,16 @@ def main(**kwargs):
 
         cmd_str = "satsim --debug DEBUG run --device " + str(FLAGS.device) + " --mode eager --output_dir " + sensor_dir + " " + output_config_file
 
+        cmd_strings.append(cmd_str)
+
     # Iterate over the commands...
     for cmd_str in cmd_strings:
 
         # ...sequentially launching each.
+        print(cmd_str)
         process = subprocess.Popen(cmd_str, shell=True, stdout=subprocess.PIPE)
         process.wait()
+        print(process.returncode)
 
 
 if __name__ == '__main__':
@@ -126,11 +132,11 @@ if __name__ == '__main__':
                         help='Path to the JSON config for SatSim.')
 
     parser.add_argument('--num_sensors', type=int,
-                        default=64,
+                        default=16,
                         help='The number of sensors to simulate.')
 
     parser.add_argument('--num_samples', type=int,
-                        default=32,
+                        default=8,
                         help='The number of samples from each sensor.')
 
     parser.add_argument('--num_frames', type=int,

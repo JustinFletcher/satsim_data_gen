@@ -1,0 +1,8 @@
+python sensor_data_producer.py --device=0 --num_sensors=16 --num_samples=8 --="/home/jfletcher/data/satnet_v2_sensor_generalization_0/"
+
+python sensor_data_producer.py --device=1 --num_sensors=16 --num_samples=8 --="/home/jfletcher/data/satnet_v2_sensor_generalization_1/"
+
+python sensor_data_producer.py --device=2 --num_sensors=16 --num_samples=8 --="/home/jfletcher/data/satnet_v2_sensor_generalization_2/"
+
+python sensor_data_producer.py --device=3 --num_sensors=16 --num_samples=8 --="/home/jfletcher/data/satnet_v2_sensor_generalization_3/"
+
