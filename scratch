@@ -1,8 +1,25 @@
-python sensor_data_producer.py --device=0 --num_sensors=16 --num_samples=8 --="/home/jfletcher/data/satnet_v2_sensor_generalization_0/"
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_data_producer.py --device=0 --num_sensors=4 --num_samples=50000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_0/"
 
-python sensor_data_producer.py --device=1 --num_sensors=16 --num_samples=8 --="/home/jfletcher/data/satnet_v2_sensor_generalization_1/"
 
-python sensor_data_producer.py --device=2 --num_sensors=16 --num_samples=8 --="/home/jfletcher/data/satnet_v2_sensor_generalization_2/"
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_data_producer.py --device=1 --num_sensors=4 --num_samples=50000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_1/"
 
-python sensor_data_producer.py --device=3 --num_sensors=16 --num_samples=8 --="/home/jfletcher/data/satnet_v2_sensor_generalization_3/"
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_data_producer.py --device=2 --num_sensors=4 --num_samples=50000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_2/"
+
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_data_producer.py --device=3 --num_sensors=4 --num_samples=50000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_3/"
 

@@ -247,8 +247,8 @@
                 "rotation":
                     { "sample": "random.uniform", "low": -0.001, "high": 0.001 },
                 "translation": [
-                    { "sample": "random.uniform", "low": 0.0, "high": 1.0, "negate": 0.5 },
-                    { "sample": "random.uniform", "low": 0.0, "high": 1.0, "negate": 0.5 }
+                    { "sample": "random.uniform", "low": 2.0, "high": 11.0, "negate": 0.5 },
+                    { "sample": "random.uniform", "low": 2.0, "high": 11.0, "negate": 0.5 }
                 ]
             }
         },
