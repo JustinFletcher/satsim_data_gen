@@ -5,56 +5,19 @@ Author: 1st Lt Ian McQuaid
 Date: 23 March 2019
 """
 
-import cv2
 import os
+from glob import glob
 import json
+import shutil
+
+import argparse
+
 import astropy.io.fits
 import tensorflow as tf
 import numpy as np
 
 
-def draw_bounding_boxes(image, obj_dict_gt, save_path="./test_img.png", nchnls=1, nbits=16):
-    if nchnls == 1:
-        # replicate 1 channel to 3 channels:
-        image = np.squeeze(np.stack((image,) * 3, -1))
-
-    clr_grn = (0, 255, 0)
-    if nbits == 16:
-        clr_grn = (0, 65535, 0)
-
-    draw_gt_boxes(image, obj_dict_gt, clr_grn)
-
-    # write the image with bounding boxes to file
-    png_compression = 0  # lowest compression, highest quality, largest file size
-    if nbits == 16:
-        cv2.imwrite(save_path, image.astype('uint16'), [cv2.IMWRITE_PNG_COMPRESSION, png_compression])
-    else:
-        cv2.imwrite(save_path, image.astype('uint8'), [cv2.IMWRITE_PNG_COMPRESSION, png_compression])
-
-
-def draw_gt_boxes(image, obj_dict_gt, color):
-    shape = image.shape
-
-    h = shape[0]
-    w = shape[1]
-
-    # obj_dict_gt could be empty: must guard against
-    if len(obj_dict_gt) > 0:
-        for obj in obj_dict_gt:
-            x0 = int(obj['x_min'] * w)
-            y0 = int(obj['y_min'] * h)
-            x1 = int(obj['x_max'] * w)
-            y1 = int(obj['y_max'] * h)
-
-            cv2.rectangle(image, (x0, y0), (x1, y1), color, 1)
-            cv2.putText(image,
-                        obj['class_name'],
-                        (x0, y0 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.30,
-                        color, 1, cv2.LINE_AA)
-
-    return image
+from itertools import islice, zip_longest
 
 
 def read_fits(filepath):
@@ -72,125 +35,261 @@ def read_fits(filepath):
 
 
 def _int64_feature(value):
+
     return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
 
 
 def _bytes_feature(value):
+
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=value))
 
 
 def _floats_feature(value):
+
     return tf.train.Feature(float_list=tf.train.FloatList(value=value))
 
 
-def write_tfrecord(image_list, annotation_list, tfrecord_path):
-    # Open up a writer for this TFRecord
-    writer = tf.python_io.TFRecordWriter(tfrecord_path)
+def build_satnet_tf_example(example):
 
-    # Write each example to file
-    count = 0
-    num_images = len(image_list)
-    for image_path, annotation_path in zip(image_list, annotation_list):
-        if (count % 100) == 0:
-            print("On image " + str(count) + " of " + str(num_images))
+    (image_path, annotation_path) = example
 
-        # Read in the files for this example
-        image = read_fits(image_path)
-        fp = open(annotation_path, "r")
-        annotations = json.load(fp)["data"]
-        fp.close()
-
-        sequence = [file.encode() for file in annotations["file"]["sequence"]]
-        class_name = [obj["class_name"].encode() for obj in annotations["objects"]]
-        class_id = [obj["class_id"] for obj in annotations["objects"]]
-        y_min = [obj["y_min"] for obj in annotations["objects"]]
-        y_max = [obj["y_max"] for obj in annotations["objects"]]
-        x_min = [obj["x_min"] for obj in annotations["objects"]]
-        x_max = [obj["x_max"] for obj in annotations["objects"]]
-        source = [obj["source"].encode() for obj in annotations["objects"]]
-        magnitude = [obj["magnitude"] for obj in annotations["objects"]]
-
-        dir_name = annotations["file"]["dirname"]
-        file_name = annotations["file"]["filename"]
-
-        # Remove the extension (to be compatible with what Greg did...)
-        file_name = file_name.replace('.fits', '')
-
-        # Put the two together via '_' (again, to be compatible...)
-        path_name = dir_name + "_" + file_name
-
-        # Replace the unknown magnitude's with NaN's
-        for i in range(len(magnitude)):
-            if magnitude[i] is None:
-                magnitude[i] = float("NaN")
-
-        # Create the features for this example
-        features = {
-            "images_raw": _bytes_feature([image.tostring()]),
-            "filename": _bytes_feature([path_name.encode()]),
-            "height": _int64_feature([annotations["sensor"]["height"]]),
-            "width": _int64_feature([annotations["sensor"]["width"]]),
-            "classes": _int64_feature(class_id),
-            "ymin": _floats_feature(y_min),
-            "ymax": _floats_feature(y_max),
-            "xmin": _floats_feature(x_min),
-            "xmax": _floats_feature(x_max),
-        }
-
-        # Create an example protocol buffer
-        example = tf.train.Example(features=tf.train.Features(feature=features))
-
-        # Serialize to string and write on the file
-        writer.write(example.SerializeToString())
-        count += 1
-
-
-def parse_file_list(file_name):
-    satnet_path = os.path.join(os.getcwd(), "SatNet.v.1.0.0.0", "SatNet")
-    split_path = os.path.join(satnet_path, "info", "data_split", file_name)
-    data_path = os.path.join(satnet_path, "data")
-
-    # Read the split file in
-    fp = open(split_path, "r")
-    file_contents = fp.read()
+    # Read in the files for this example
+    image = read_fits(image_path)
+    fp = open(annotation_path, "r")
+    annotations = json.load(fp)["data"]
     fp.close()
 
-    # Split by line break
-    file_list = file_contents.split("\n")
+    sequence = [file.encode() for file in annotations["file"]["sequence"]]
+    class_name = [obj["class_name"].encode() for obj in annotations["objects"]]
+    class_id = [obj["class_id"] for obj in annotations["objects"]]
+    y_min = [obj["y_min"] for obj in annotations["objects"]]
+    y_max = [obj["y_max"] for obj in annotations["objects"]]
+    x_min = [obj["x_min"] for obj in annotations["objects"]]
+    x_max = [obj["x_max"] for obj in annotations["objects"]]
+    source = [obj["source"].encode() for obj in annotations["objects"]]
+    magnitude = [obj["magnitude"] for obj in annotations["objects"]]
 
-    # Remove the extension (we will add them back in later)
-    file_list = [".".join(name.split(".")[:-1]) for name in file_list]
+    dir_name = annotations["file"]["dirname"]
+    file_name = annotations["file"]["filename"]
 
-    # Split into the collect name and file name (because string manipulation is fun!)
-    collect_list = [name.split("_")[0] for name in file_list]
-    file_list = ["_".join(name.split("_")[1:]) for name in file_list]
+    # Remove the extension (to be compatible with what Greg did...)
+    file_name = file_name.replace('.fits', '')
 
-    image_list = []
-    annotation_list = []
-    for i in range(len(collect_list)):
-        collect_path = collect_list[i]
-        file_name = file_list[i]
-        if len(file_name) > 0:
-            # Build the path to each .fits image
-            img_path = os.path.join(data_path, collect_path, "ImageFiles", file_name + ".fits")
-            annotation_path = os.path.join(data_path, collect_path, "Annotations", file_name + ".json")
-            image_list.append(img_path)
-            annotation_list.append(annotation_path)
+    # Put the two together via '_' (again, to be compatible...)
+    path_name = dir_name + "_" + file_name
 
-    # Make a list for images and for annotations
-    return image_list, annotation_list
+    # Replace the unknown magnitude's with NaN's
+    for i in range(len(magnitude)):
+        if magnitude[i] is None:
+            magnitude[i] = float("NaN")
+
+    # Create the features for this example
+    features = {
+        "images_raw": _bytes_feature([image.tostring()]),
+        "filename": _bytes_feature([path_name.encode()]),
+        "height": _int64_feature([annotations["sensor"]["height"]]),
+        "width": _int64_feature([annotations["sensor"]["width"]]),
+        "classes": _int64_feature(class_id),
+        "ymin": _floats_feature(y_min),
+        "ymax": _floats_feature(y_max),
+        "xmin": _floats_feature(x_min),
+        "xmax": _floats_feature(x_max),
+    }
+
+    # Create an example protocol buffer
+    example = tf.train.Example(features=tf.train.Features(feature=features))
+
+    return(example)
 
 
-if __name__ == "__main__":
-    print("Script starting...")
+def group_list(ungrouped_list, group_size, padding=None):
 
-    # Read in the files that we need in each individual TFRecord
-    train_images, train_annotations = parse_file_list("train.txt")
-    valid_images, valid_annotations = parse_file_list("valid.txt")
-    test_images, test_annotations = parse_file_list("test.txt")
+    # Magic, probably.
+    grouped_list = zip_longest(*[iter(ungrouped_list)] * group_size,
+                               fillvalue=padding)
 
-    write_tfrecord(train_images, train_annotations, "train.tfrecords")
-    write_tfrecord(valid_images, valid_annotations, "valid.tfrecords")
-    write_tfrecord(test_images,  test_annotations, "test.tfrecords")
+    return(grouped_list)
 
-    print("Script complete. Exiting...")
+
+def make_clean_dir(directory):
+
+    if os.path.exists(directory):
+        shutil.rmtree(directory)
+    os.makedirs(directory)
+
+
+def get_immediate_subdirectories(a_dir):
+    """
+    CV from SO
+    """
+
+    return [name for name in os.listdir(a_dir)
+
+            if os.path.isdir(os.path.join(a_dir, name))]
+
+
+def build_satsim_dataset(datapath):
+
+    # Get subdirectories of this path.
+
+    # Iterate over each subdirectory, each of which is a collect.
+    examples = list()
+
+    for directory_name in get_immediate_subdirectories(datapath):
+
+        print(directory_name)
+
+        colleciton_path = os.path.join(datapath, directory_name)
+        image_dir_path = os.path.join(colleciton_path, "ImageFiles")
+        annotation_dir_path = os.path.join(colleciton_path, "Annotations")
+
+        image_paths = sorted(os.listdir(image_dir_path))
+        annotation_paths = sorted(os.listdir(annotation_dir_path))
+
+        for (image_path,
+             annotation_path) in zip(image_paths, annotation_paths):
+
+            # Get first image and annothation and write to file path.
+            example = (os.path.join(image_dir_path, image_path),
+                       os.path.join(annotation_dir_path, annotation_path))
+
+            examples.append(example)
+
+    return(examples)
+
+
+def partition_examples(examples, splits_dict):
+
+    # Create a dict to hold examples.
+    partitions = dict()
+
+    # Store the total number of examples.
+    num_examples = len(examples)
+
+    # Iterate over the items specifying the partitions.
+    for (split_name, split_fraction) in splits_dict.items():
+
+        # Compute the sixe of this parition.
+        num_split_examples = int(split_fraction * num_examples)
+
+        # Pop the next partition elements.
+        partition_examples = examples[:num_split_examples]
+        examples = examples[num_split_examples:]
+
+        # Map this paritions list of examples to this parition name.
+        partitions[split_name] = partition_examples
+
+    return(partitions)
+
+
+def create_tfrecords(tfrecords_name="tfrecords",
+                     datapath_to_examples_fn=build_satsim_dataset,
+                     tf_example_builder=build_satnet_tf_example,
+                     splits_dict={"train": 0.6,
+                                  "valid": 0.2,
+                                  "test": 0.2}):
+    """
+    Given an input data directory, process that directory into examples. Group
+    those examples into groups to write to a dir.
+    """
+
+    examples = datapath_to_examples_fn(FLAGS.data_dir)
+
+    # TODO: Separate out spilt_fraction fraction of the examples.
+    partitioned_examples = partition_examples(examples, splits_dict)
+    # partitioned_examples = examples
+
+    for (split_name, split_examples) in partitioned_examples.items():
+
+        # Build a clean directory to store this partitions TFRecords.
+        output_dir = os.path.join(FLAGS.output_dir,
+                                  split_name)
+        make_clean_dir(output_dir)
+
+        # Group the examples in this paritions to write to seperate TFRecords.
+        example_groups = group_list(split_examples,
+                                    FLAGS.examples_per_tfrecord)
+
+        # Iterate over each group. Each is a list of examples.
+        for group_index, example_group in enumerate(example_groups):
+
+            print("Saving group %s" % str(group_index))
+
+            # Specify the group name.
+            group_tfrecords_name = tfrecords_name + '_' + split_name + '_' + str(group_index) + '.tfrecords'
+
+            # Build the path to write the output to.
+            output_path = os.path.join(FLAGS.output_dir,
+                                       split_name,
+                                       group_tfrecords_name)
+
+            # Open a writer to the provided TFRecords output location.
+            with tf.io.TFRecordWriter(output_path) as writer:
+
+                # For each example...
+                for example in example_group:
+
+                    # ...if the example isn't empty...
+                    if example:
+
+                        # ...construct a TF Example object...
+                        tf_example = tf_example_builder(example)
+
+                        # ...and write it to the TFRecord.
+                        writer.write(tf_example.SerializeToString())
+
+
+def main(unused_argv):
+
+    split_dict = {"train": 0.6, "valid": 0.2, "test": 0.2}
+
+    create_tfrecords(tfrecords_name=FLAGS.name,
+                     datapath_to_examples_fn=build_satsim_dataset,
+                     tf_example_builder=build_satnet_tf_example,
+                     splits_dict=split_dict)
+
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--name', type=str,
+                        default="satsim",
+                        help='Name of the dataset to build.')
+
+    parser.add_argument('--data_dir', type=str,
+                        default="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_0",
+                        help='Path to SatSim output data.')
+
+    parser.add_argument('--output_dir', type=str,
+                        default="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/tfrecords",
+                        help='Path to the JSON config for SatSim.')
+
+    parser.add_argument("--input_type",
+                        default="json",
+                        help="One of [pickle_frcnn, pickle_yolo3, json]. Indicates pickle format.")
+
+    parser.add_argument("--examples_per_tfrecord",
+                        default=8,
+                        help="Maximum number of examples to write to a file")
+
+    parser.add_argument("--score_limit",
+                        default=0.0,
+                        help="All inferred boxes w/ lower scores are removed.")
+
+    parser.add_argument("--get_recall_at_99precision", action='store_true',
+                        default=False,
+                        help="If True, gets the recall at IOU=0.85 and Precision=0.99")
+
+    parser.add_argument("--print_dataframe", action='store_true',
+                        default=False,
+                        help="If True, prints a pandas dataframe of analysis.")
+
+    parser.add_argument("--plot_pr_curve", action='store_true',
+                        default=False,
+                        help="If True, plots the PR curve.")
+
+    FLAGS, unparsed = parser.parse_known_args()
+
+    main(unparsed)
