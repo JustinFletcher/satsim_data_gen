@@ -4,15 +4,16 @@ date: 7 Oct 2018
 """
 
 from __future__ import absolute_import, division, print_function
+
+import os
 import json
 import argparse
 import itertools
-from abc import ABC, abstractmethod
 import numpy as np
-from numpy import linalg as la
 import pandas as pd
+from numpy import linalg as la
 import matplotlib.pyplot as plt
-import os
+from abc import ABC, abstractmethod
 
 
 def sigmoid(x):
@@ -25,13 +26,15 @@ class ObjectDetectionAnalysis(ABC):
                  inferred_boxes,
                  confidence_thresholds=None):
         """
-        Abstract base class constructor, as well as executor of core analysis. Relies on polymorphic
-        analyse_detections() function which should be implemented by the child class. Additionally expects
+        Abstract base class constructor, as well as executor of core analysis.
+        Relies on polymorphic analyse_detections() function which should be
+        implemented by the child class. Additionally expects
         compute_statistics() to be implemented by the child class.
 
         :param truth_boxes: list of truth boxes
         :param inferred_boxes: list of predicted boxes
-        :param confidence_thresholds: list of desired confidence thresholds to use in the analysis
+        :param confidence_thresholds: list of desired confidence thresholds to
+               use in the analysis
         """
         super().__init__()
         self.truth_boxes = truth_boxes
@@ -40,7 +43,10 @@ class ObjectDetectionAnalysis(ABC):
         # If no confidence thresholds are provided, sample some logistically.
         if confidence_thresholds is None:
             confidence_thresholds = sigmoid(np.linspace(-100, 100, 100))
-            confidence_thresholds = np.concatenate([[0.0], confidence_thresholds, [1.0]], axis=0)
+            confidence_thresholds = np.concatenate([[0.0],
+                                                    confidence_thresholds
+                                                    [1.0]],
+                                                   axis=0)
         self.confidence_thresholds = np.unique(confidence_thresholds)
 
         # Create a dict to map the analyses to images.
@@ -68,7 +74,7 @@ class ObjectDetectionAnalysis(ABC):
     @abstractmethod
     def compute_statistics(self, statistics_dict=None):
         """
-        Convert analysis results to DataFrame and add in any desired statistics.
+        Convert analysis results to DataFrame and comnpute statistics.
 
         :param statistics_dict: desired statistic (key-value=name-function)
         :return: pandas DataFrame containing results

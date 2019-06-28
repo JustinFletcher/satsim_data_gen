@@ -1,25 +1,78 @@
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=0 --num_sensors=4 --num_samples=50000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_0/"
-
-
-source ~/.profile
-conda deactivate
-cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=1 --num_sensors=4 --num_samples=50000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_1/"
+python sensor_data_producer.py --device=0 --num_sensors=1 --num_samples=5000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/"
 
 
 
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=2 --num_sensors=4 --num_samples=50000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_2/"
+python sensor_data_producer.py --device=1 --num_sensors=1 --num_samples=5000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/0"
 
 
 
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=3 --num_sensors=4 --num_samples=50000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_3/"
+python sensor_data_producer.py --device=2 --num_sensors=1 --num_samples=5000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/1"
+
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_data_producer.py --device=3 --num_sensors=1 --num_samples=5000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/2"
+
+
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_data_producer.py --device=1 --num_sensors=8 --num_samples=8 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_micro/"
+
+
+
+############### Launch SSD ################
+
+
+# SSD Trained SatNet, works.
+source ~/.profile
+conda activate tf112-gpu
+cd ~/research/SSD_Keras
+python train_and_test.py --gpu_list="0" --train_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_train.tfrecords --valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords --test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords --num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satnet_0" --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data
+
+
+
+# SSD Trained SatSim, sensor bank.
+source ~/.profile
+conda deactivate
+conda activate tf112-gpu
+cd ~/research/SSD_Keras
+python train_and_test.py --gpu_list="1" --train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/train/ --valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/valid/ --test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/test/ --num_train_images=18000 --num_valid_images=6000 num_test_images=6000--batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_0" --metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/0/sensor_0
+
+
+
+# SSD SatSim cross-validated on SatNet.
+source ~/.profile
+conda deactivate
+conda activate tf112-gpu
+cd ~/research/SSD_Keras
+python train_and_test.py --gpu_list="2" --train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/train/ --valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords --test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords  --num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_cv_satnet_0" --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data
+
+
+
+# Reset and reinstall tf112-gpu
+conda env remove -n tf112-gpu
+conda create -n tf112-gpu tensorflow-gpu=1.12.0
+conda activate tf112-gpu
+pip install pillow
+pip install pandas
+pip install matplotlib
+
+# Tensorboard
+source ~/.profile
+conda activate tf112-gpu
+tensorboard --logdir=.
 

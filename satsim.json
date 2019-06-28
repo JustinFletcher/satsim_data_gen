@@ -245,7 +245,7 @@
             "motion": {
                 "mode": "affine",
                 "rotation":
-                    { "sample": "random.uniform", "low": -0.001, "high": 0.001 },
+                    { "sample": "random.uniform", "low": -1e-6, "high": 1e-6 },
                 "translation": [
                     { "sample": "random.uniform", "low": 5.0, "high": 20.0, "negate": 0.5 },
                     { "sample": "random.uniform", "low": 5.0, "high": 20.0, "negate": 0.5 }
@@ -256,7 +256,7 @@
             "mode": "list",
             "sample": "random.list",
             "length": 
-                { "sample": "random.randint", "low": 0, "high": 15 },
+                { "sample": "random.randint", "low": 0, "high": 5 },
             "list": {
                 "mode": "line",
                 "origin": [

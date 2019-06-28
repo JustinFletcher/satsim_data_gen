@@ -6,7 +6,6 @@ Date: 23 March 2019
 """
 
 import os
-from glob import glob
 import json
 import shutil
 
@@ -55,6 +54,7 @@ def build_satnet_tf_example(example):
 
     # Read in the files for this example
     image = read_fits(image_path)
+
     fp = open(annotation_path, "r")
     annotations = json.load(fp)["data"]
     fp.close()
@@ -120,7 +120,7 @@ def make_clean_dir(directory):
 
 def get_immediate_subdirectories(a_dir):
     """
-    CV from SO
+    Shift+CV from SO
     """
 
     return [name for name in os.listdir(a_dir)
@@ -193,13 +193,17 @@ def create_tfrecords(tfrecords_name="tfrecords",
     those examples into groups to write to a dir.
     """
 
+    # Map the provided data directory to a list of tf.Examples.
     examples = datapath_to_examples_fn(FLAGS.data_dir)
 
-    # TODO: Separate out spilt_fraction fraction of the examples.
+    # Use the provided split dictionary to parition the example as a dict.
     partitioned_examples = partition_examples(examples, splits_dict)
-    # partitioned_examples = examples
 
+    # Iterate over each partition building the TFRecords.
     for (split_name, split_examples) in partitioned_examples.items():
+
+        print("Writing partition %s w/ %d examples." % (split_name,
+                                                        len(split_examples)))
 
         # Build a clean directory to store this partitions TFRecords.
         output_dir = os.path.join(FLAGS.output_dir,
@@ -213,7 +217,8 @@ def create_tfrecords(tfrecords_name="tfrecords",
         # Iterate over each group. Each is a list of examples.
         for group_index, example_group in enumerate(example_groups):
 
-            print("Saving group %s" % str(group_index))
+            print("Saving group %s w/ %d examples" % (str(group_index),
+                                                      len(example_group)))
 
             # Specify the group name.
             group_tfrecords_name = tfrecords_name + '_' + split_name + '_' + str(group_index) + '.tfrecords'
@@ -232,6 +237,8 @@ def create_tfrecords(tfrecords_name="tfrecords",
                     # ...if the example isn't empty...
                     if example:
 
+                        # print("Writing example %s" % example[0])
+
                         # ...construct a TF Example object...
                         tf_example = tf_example_builder(example)
 
@@ -249,7 +256,6 @@ def main(unused_argv):
                      splits_dict=split_dict)
 
 
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -259,11 +265,11 @@ if __name__ == '__main__':
                         help='Name of the dataset to build.')
 
     parser.add_argument('--data_dir', type=str,
-                        default="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_0",
+                        default="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/0/sensor_0",
                         help='Path to SatSim output data.')
 
     parser.add_argument('--output_dir', type=str,
-                        default="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/tfrecords",
+                        default="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0",
                         help='Path to the JSON config for SatSim.')
 
     parser.add_argument("--input_type",
@@ -271,24 +277,8 @@ if __name__ == '__main__':
                         help="One of [pickle_frcnn, pickle_yolo3, json]. Indicates pickle format.")
 
     parser.add_argument("--examples_per_tfrecord",
-                        default=8,
+                        default=128,
                         help="Maximum number of examples to write to a file")
-
-    parser.add_argument("--score_limit",
-                        default=0.0,
-                        help="All inferred boxes w/ lower scores are removed.")
-
-    parser.add_argument("--get_recall_at_99precision", action='store_true',
-                        default=False,
-                        help="If True, gets the recall at IOU=0.85 and Precision=0.99")
-
-    parser.add_argument("--print_dataframe", action='store_true',
-                        default=False,
-                        help="If True, prints a pandas dataframe of analysis.")
-
-    parser.add_argument("--plot_pr_curve", action='store_true',
-                        default=False,
-                        help="If True, plots the PR curve.")
 
     FLAGS, unparsed = parser.parse_known_args()
 

@@ -256,7 +256,7 @@
             "mode": "list",
             "sample": "random.list",
             "length": 
-                { "sample": "random.randint", "low": 0, "high": 15 },
+                { "sample": "random.randint", "low": 0, "high": 5 },
             "list": {
                 "mode": "line",
                 "origin": [
