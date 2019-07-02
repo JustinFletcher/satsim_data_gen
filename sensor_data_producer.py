@@ -89,15 +89,15 @@ def make_clean_dir(directory):
 
 def main(**kwargs):
 
-    with open(FLAGS.config_file_path, 'r') as f:
-
-        # Read the base config file which randomizes over other properties.
-        base_config_dict = json.load(f)
-
     cmd_strings = list()
 
     # Generate a new config file randomly selecting from an FPA config.
     for sensor_num in range(FLAGS.num_sensors):
+
+        with open(FLAGS.config_file_path, 'r') as f:
+
+            # Read the base config file which randomizes over other properties.
+            base_config_dict = json.load(f)
 
         config_dict = build_sensor_config(FLAGS.num_samples,
                                           FLAGS.num_frames_per_sample,

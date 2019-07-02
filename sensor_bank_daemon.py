@@ -117,8 +117,30 @@ def compute_needed_samples(data_bank_dir, num_samples):
     return(needed_samples)
 
 
+def launch_satsim_run(output_dir,
+                      config_file_path,
+                      device=0,
+                      debug_satsim=True):
+
+    if debug_satsim:
+
+        cmd_str = "satsim --debug DEBUG run --device " + str(device) + " --mode eager --output_dir " + output_dir + " " + config_file_path
+
+    else:
+
+        cmd_str = "satsim run --device " + str(device) + " --mode eager --output_dir " + output_dir + " " + config_file_path
+
+    process = subprocess.Popen(cmd_str,
+                               shell=True,
+                               stdout=subprocess.PIPE)
+    process.wait()
+    print(process.returncode)
+    return(process.returncode)
+
+
 def populate_needed_samples(needed_samples_dict,
                             device=0,
+                            debug_satsim=True,
                             fill_fraction=1.0):
 
     for sensor_dir_path, num_elements_needed in needed_samples_dict.items():
@@ -164,21 +186,10 @@ def populate_needed_samples(needed_samples_dict,
 
                 json.dump(sensor_config_dict, fp)
 
-            if FLAGS.debug_satsim:
-
-                cmd_str = "satsim --debug DEBUG run --device " + str(device) + " --mode eager --output_dir " + sensor_dir_path + " " + sensor_config_file_path
-
-            else:
-
-                cmd_str = "satsim run --device " + str(device) + " --mode eager --output_dir " + sensor_dir_path + " " + sensor_config_file_path
-
-            process = subprocess.Popen(cmd_str,
-                                       shell=True,
-                                       stdout=subprocess.PIPE)
-            process.wait()
-            print(process.returncode)
-
-            # print("I would have run: " + cmd_str)
+            launch_satsim_run(output_dir=sensor_dir_path,
+                              config_file_path=sensor_config_file_path,
+                              device=device,
+                              debug_satsim=FLAGS.debug_satsim)
 
 
 def main(**kwargs):
@@ -191,28 +202,53 @@ def main(**kwargs):
                                                      FLAGS.num_samples)
 
         # So long as there are sensors that need completion, complete them.
-        while sum(needed_samples_dict.values()) > 0:
+        while sum(np.array(list(needed_samples_dict.values())).clip(0)) > 0:
 
             # Build a dict mapping sensor paths to number of samples needed.
             needed_samples_dict = compute_needed_samples(FLAGS.data_bank_dir,
                                                          FLAGS.num_samples)
 
-            print(needed_samples_dict)
-
             # Then, populate some or all those samples.
             populate_needed_samples(needed_samples_dict,
                                     device=FLAGS.device,
-                                    fill_fraction=0.1)
+                                    debug_satsim=FLAGS.debug_satsim,
+                                    fill_fraction=FLAGS.fill_fraction)
 
-        # If we're here, all the sensors have been completed; make a new one.
+        # Once here, all the sensors have been filled; make a new one...
+        with open(FLAGS.config_file_path, 'r') as f:
 
-        die
+            # Read the base config file which randomizes over other properties.
+            base_config_dict = json.load(f)
 
-    
+        # Build a new randomized config dict for this sensor; 
+        config_dict = build_sensor_config(1,
+                                          FLAGS.num_frames_per_sample,
+                                          base_config_dict)
 
-    # If we're here, every existing sensor dir has the right number of samples.
+        # Create a directory for this sensors examples; first get existing.
+        sensor_dirs = glob.glob(os.path.join(FLAGS.data_bank_dir, "sensor_*"))
 
+        # Then take the suffix post "sensor_", int it, max it, and add 1.
+        sensor_nums = [int(s.split("sensor_")[-1]) for s in sensor_dirs]
+        sensor_num = np.max(sensor_nums) + 1
 
+        # construct the new sensor name, and make a dir name to hold its data.
+        sensor_name_str = "sensor_" + str(sensor_num)
+        sensor_dir_path = os.path.join(FLAGS.data_bank_dir, sensor_name_str)
+
+        print("Making: " + sensor_name_str)
+
+        # Clear this sensor dir if it exists, then make it.
+        make_clean_dir(sensor_dir_path)
+
+        # Build a filename for this config.
+        sensor_json_file = "sensor_" + str(sensor_num) + ".json"
+        output_config_file = os.path.join(sensor_dir_path, sensor_json_file)
+
+        # Write a JSON file in the new dir.
+        with open(output_config_file, 'w') as fp:
+
+            json.dump(config_dict, fp)
 
 
 if __name__ == '__main__':
@@ -221,28 +257,14 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
-
     parser.add_argument('--data_bank_dir', type=str,
                         default="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank_debug/",
                         help='Path to SatSim sensor bank.')
-
 
     # Set arguments and their default values
     parser.add_argument('--config_file_path', type=str,
                         default="/home/jfletcher/research/satsim_data_gen/satsim.json",
                         help='Path to the JSON config for SatSim.')
-
-    parser.add_argument('--sensor_bank_dir', type=str,
-                        default="/home/jfletcher/data/satsim_data_gen/",
-                        help='Path to the JSON config for SatSim.')
-
-    # parser.add_argument('--config_file_path', type=str,
-    #                     default="C:\\research\\satsim_data_gen\\sensor_data_config.json",
-    #                     help='Path to the JSON config for SatSim.')
-
-    # parser.add_argument('--output_dir', type=str,
-    #                     default="C:\\data\\satsim_data_gen\\",
-    #                     help='Path to the JSON config for SatSim.')
 
     parser.add_argument('--num_samples', type=int,
                         default=16,
@@ -255,6 +277,10 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=int,
                         default=0,
                         help='Number of the GPU use.')
+
+    parser.add_argument('--fill_fraction', type=float,
+                        default=0.25,
+                        help='A float in (0, 1] tunes sample production goal.')
 
     parser.add_argument('--debug_satsim', action='store_true',
                         default=False,
