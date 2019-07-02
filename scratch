@@ -35,35 +35,9 @@ python sensor_data_producer.py --device=3 --num_sensors=1 --num_samples=5000 --n
 ############### Launch TFRecord Writer ###############
 
 
-
- # Iterate over each "sensor_*" director in this directory... 
-    # ...and write out TFRecords to a specified output dir.
-
-
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-
-python make_satsim_tfrecords.py --name="sensor_0" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_0" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_0_tfrecords"
-
-python make_satsim_tfrecords.py --name="sensor_1" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_1" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_1_tfrecords"
-
-python make_satsim_tfrecords.py --name="sensor_2" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_2" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_2_tfrecords"
-
-python make_satsim_tfrecords.py --name="sensor_3" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_3" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_3_tfrecords"
-
-python make_satsim_tfrecords.py --name="sensor_4" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_4" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_4_tfrecords"
-
-python make_satsim_tfrecords.py --name="sensor_5" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_5" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_5_tfrecords"
-
-python make_satsim_tfrecords.py --name="sensor_6" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_6" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_6_tfrecords"
-
-python make_satsim_tfrecords.py --name="sensor_7" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_7" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_7_tfrecords"
-
-
-
-
-
 
 python make_satsim_tfrecords.py --name="satsim_sensor_bank" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny_tfrecords" --data_bank
 

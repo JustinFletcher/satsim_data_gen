@@ -6,6 +6,8 @@ date: 20 Jun 2019
 
 import os
 
+import glob
+
 import json
 
 import shutil
@@ -18,10 +20,8 @@ import numpy as np
 
 import tensorflow as tf
 
-# I am launched on a node with one param: num_samples
 
-
-def build_sensor_config(num_samples, base_config_dict):
+def build_sensor_config(num_samples, num_frames_per_sample, base_config_dict):
 
     config_dict = base_config_dict
 
@@ -72,6 +72,8 @@ def build_sensor_config(num_samples, base_config_dict):
     time_dict["gap"] = np.random.uniform(0.1, 1)
     fpa_dict["time"] = time_dict
 
+    fpa_dict["num_frames"] = num_frames_per_sample
+
     # Set the FPA.
     config_dict['fpa'] = fpa_dict
 
@@ -85,56 +87,132 @@ def make_clean_dir(directory):
     os.makedirs(directory)
 
 
-def main(**kwargs):
+def get_immediate_subdirectories(a_dir):
+    """
+    Shift+CV from SO
+    """
+
+    return [name for name in os.listdir(a_dir)
+
+            if os.path.isdir(os.path.join(a_dir, name))]
+
+
+def compute_needed_samples(data_bank_dir, num_samples):
+
+    needed_samples = dict()
 
     # First, read the sensor_* subdirectories of the given directory.
+    for sensor_dir in get_immediate_subdirectories(data_bank_dir):
 
-    # Iterate over sensor directory and store those with insufficient samples.
+        sensor_dir_path = os.path.join(data_bank_dir, sensor_dir)
 
-    # Find the number of availible devices on this system.
+        data_element_dir_list = get_immediate_subdirectories(sensor_dir_path)
 
-    # For each availible device.
+        num_elements_produced = len(data_element_dir_list)
 
-    with open(FLAGS.config_file_path, 'r') as f:
+        num_elements_needed = num_samples - num_elements_produced
 
-        # Read the base config file which randomizes over other properties.
-        base_config_dict = json.load(f)
+        needed_samples[sensor_dir_path] = num_elements_needed
 
-    cmd_strings = list()
+    return(needed_samples)
 
-    # Generate a new config file randomly selecting from an FPA config.
-    for sensor_num in range(FLAGS.num_sensors):
 
-        config_dict = build_sensor_config(FLAGS.num_samples, base_config_dict)
+def populate_needed_samples(needed_samples_dict,
+                            device=0,
+                            fill_fraction=1.0):
 
-        # Create a directory for this sensors runs.
-        sensor_name_str = "sensor_" + str(sensor_num)
-        sensor_dir = os.path.join(FLAGS.output_dir, sensor_name_str)
+    for sensor_dir_path, num_elements_needed in needed_samples_dict.items():
 
-        # Clear this sensor dir if it exists, then make it.
-        make_clean_dir(sensor_dir)
+        # Check if more examples are needed form this sensor; if so, make them.
+        if num_elements_needed > 0:
 
-        # Build a filename for this config.
-        sensor_json_file = "sensor_" + str(sensor_num) + ".json"
-        output_config_file = os.path.join(sensor_dir, sensor_json_file)
+            # First, glob onto all files matching *.json in this sensor dir.
+            sensor_config_pattern = os.path.join(sensor_dir_path, "*.json")
+            sensor_config_file_paths = glob.glob(sensor_config_pattern)
 
-        # Write a JSON file in the new dir.
-        with open(output_config_file, 'w') as fp:
+            # Ensure that one path is returned, otherwise something's wrong...
+            if len(sensor_config_file_paths) != 1:
 
-            json.dump(config_dict, fp)
+                # ...so stop here to avoid damage.
+                print(sensor_config_file_paths)
+                raise Exception('Found >1 *.json in ' + sensor_dir_path)
 
-        cmd_str = "satsim --debug DEBUG run --device " + str(FLAGS.device) + " --mode eager --output_dir " + sensor_dir + " " + output_config_file
+            # But, if nothing is wrong...
+            else:
 
-        cmd_strings.append(cmd_str)
+                # s...strip the list, because we know there's only one element.
+                sensor_config_file_path = sensor_config_file_paths[0]
 
-    # Iterate over the commands...
-    for cmd_str in cmd_strings:
+            print(sensor_config_file_path)
 
-        # ...sequentially launching each.
-        print(cmd_str)
-        process = subprocess.Popen(cmd_str, shell=True, stdout=subprocess.PIPE)
-        process.wait()
-        print(process.returncode)
+            # Open the single JSON file configuring this sensor...
+            with open(sensor_config_file_path, 'r') as f:
+
+                # ...and read its contents to a dict.
+                sensor_config_dict = json.load(f)
+
+            # Select a fraction os the needed samples to make; make at least 1.
+            num_elements_needed = int(num_elements_needed * fill_fraction)
+            num_elements_needed = int(np.max([num_elements_needed, 1.0]))
+
+            print("I'm going to produce " + str(num_elements_needed))
+
+            sensor_config_dict["samples"] = num_elements_needed
+
+            # Write a JSON file in the new dir.
+            with open(sensor_config_file_path, 'w') as fp:
+
+                json.dump(sensor_config_dict, fp)
+
+            if FLAGS.debug_satsim:
+
+                cmd_str = "satsim --debug DEBUG run --device " + str(device) + " --mode eager --output_dir " + sensor_dir_path + " " + sensor_config_file_path
+
+            else:
+
+                cmd_str = "satsim run --device " + str(device) + " --mode eager --output_dir " + sensor_dir_path + " " + sensor_config_file_path
+
+            process = subprocess.Popen(cmd_str,
+                                       shell=True,
+                                       stdout=subprocess.PIPE)
+            process.wait()
+            print(process.returncode)
+
+            # print("I would have run: " + cmd_str)
+
+
+def main(**kwargs):
+
+    # This is a daemon, so it's gonna run until you kill it..
+    while True:
+
+        # Build a dict mapping sensor paths to number of samples needed.
+        needed_samples_dict = compute_needed_samples(FLAGS.data_bank_dir,
+                                                     FLAGS.num_samples)
+
+        # So long as there are sensors that need completion, complete them.
+        while sum(needed_samples_dict.values()) > 0:
+
+            # Build a dict mapping sensor paths to number of samples needed.
+            needed_samples_dict = compute_needed_samples(FLAGS.data_bank_dir,
+                                                         FLAGS.num_samples)
+
+            print(needed_samples_dict)
+
+            # Then, populate some or all those samples.
+            populate_needed_samples(needed_samples_dict,
+                                    device=FLAGS.device,
+                                    fill_fraction=0.1)
+
+        # If we're here, all the sensors have been completed; make a new one.
+
+        die
+
+    
+
+    # If we're here, every existing sensor dir has the right number of samples.
+
+
 
 
 if __name__ == '__main__':
@@ -143,12 +221,18 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
+
+    parser.add_argument('--data_bank_dir', type=str,
+                        default="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank_debug/",
+                        help='Path to SatSim sensor bank.')
+
+
     # Set arguments and their default values
     parser.add_argument('--config_file_path', type=str,
                         default="/home/jfletcher/research/satsim_data_gen/satsim.json",
                         help='Path to the JSON config for SatSim.')
 
-    parser.add_argument('--output_dir', type=str,
+    parser.add_argument('--sensor_bank_dir', type=str,
                         default="/home/jfletcher/data/satsim_data_gen/",
                         help='Path to the JSON config for SatSim.')
 
@@ -160,21 +244,21 @@ if __name__ == '__main__':
     #                     default="C:\\data\\satsim_data_gen\\",
     #                     help='Path to the JSON config for SatSim.')
 
-    parser.add_argument('--num_sensors', type=int,
-                        default=16,
-                        help='The number of sensors to simulate.')
-
     parser.add_argument('--num_samples', type=int,
-                        default=8,
+                        default=16,
                         help='The number of samples from each sensor.')
 
-    parser.add_argument('--num_frames', type=int,
+    parser.add_argument('--num_frames_per_sample', type=int,
                         default=6,
                         help='The number of frames to use in each sequence.')
 
     parser.add_argument('--device', type=int,
                         default=0,
                         help='Number of the GPU use.')
+
+    parser.add_argument('--debug_satsim', action='store_true',
+                        default=False,
+                        help='If true, write annotated JPEGs to disk.')
 
     FLAGS = parser.parse_args()
 
