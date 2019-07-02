@@ -30,6 +30,40 @@ cd ~/research/satsim_data_gen/
 python sensor_data_producer.py --device=3 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_3" --debug_satsim
 
 
+# Daemon
+
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_bank_daemon.py --device=0 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim
+
+
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_bank_daemon.py --device=1 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim
+
+
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_bank_daemon.py --device=2 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim
+
+
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_bank_daemon.py --device=3 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim
+
+
 
 
 ############### Launch TFRecord Writer ###############
