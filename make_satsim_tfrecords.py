@@ -182,22 +182,27 @@ def partition_examples(examples, splits_dict):
     return(partitions)
 
 
-def create_tfrecords(tfrecords_name="tfrecords",
+def create_tfrecords(data_dir,
+                     output_dir,
+                     tfrecords_name="tfrecords",
+                     examples_per_tfrecord=1,
                      datapath_to_examples_fn=build_satsim_dataset,
-                     tf_example_builder=build_satnet_tf_example,
-                     splits_dict={"train": 0.6,
-                                  "valid": 0.2,
-                                  "test": 0.2}):
+                     tf_example_builder_fn=build_satnet_tf_example,
+                     partition_examples_fn=partition_examples,
+                     splits_dict={"data": 1.0}):
     """
     Given an input data directory, process that directory into examples. Group
     those examples into groups to write to a dir.
     """
 
+    # TODO: Throw exception if interface functions aren't given.
+
     # Map the provided data directory to a list of tf.Examples.
-    examples = datapath_to_examples_fn(FLAGS.data_dir)
+    examples = datapath_to_examples_fn(data_dir)
 
     # Use the provided split dictionary to parition the example as a dict.
-    partitioned_examples = partition_examples(examples, splits_dict)
+    # TODO: Interface here.
+    partitioned_examples = partition_examples_fn(examples, splits_dict)
 
     # Iterate over each partition building the TFRecords.
     for (split_name, split_examples) in partitioned_examples.items():
@@ -206,13 +211,11 @@ def create_tfrecords(tfrecords_name="tfrecords",
                                                         len(split_examples)))
 
         # Build a clean directory to store this partitions TFRecords.
-        output_dir = os.path.join(FLAGS.output_dir,
-                                  split_name)
-        make_clean_dir(output_dir)
+        partition_output_dir = os.path.join(output_dir, split_name)
+        make_clean_dir(partition_output_dir)
 
         # Group the examples in this paritions to write to seperate TFRecords.
-        example_groups = group_list(split_examples,
-                                    FLAGS.examples_per_tfrecord)
+        example_groups = group_list(split_examples, examples_per_tfrecord)
 
         # Iterate over each group. Each is a list of examples.
         for group_index, example_group in enumerate(example_groups):
@@ -224,8 +227,7 @@ def create_tfrecords(tfrecords_name="tfrecords",
             group_tfrecords_name = tfrecords_name + '_' + split_name + '_' + str(group_index) + '.tfrecords'
 
             # Build the path to write the output to.
-            output_path = os.path.join(FLAGS.output_dir,
-                                       split_name,
+            output_path = os.path.join(partition_output_dir,
                                        group_tfrecords_name)
 
             # Open a writer to the provided TFRecords output location.
@@ -240,20 +242,51 @@ def create_tfrecords(tfrecords_name="tfrecords",
                         # print("Writing example %s" % example[0])
 
                         # ...construct a TF Example object...
-                        tf_example = tf_example_builder(example)
+                        tf_example = tf_example_builder_fn(example)
 
                         # ...and write it to the TFRecord.
                         writer.write(tf_example.SerializeToString())
+
+
+def get_dir_content_paths(directory):
+    """
+    Given a directory, returns a list of complete paths to its contents.
+    """
+    return([os.path.join(directory, f) for f in os.listdir(directory)])
 
 
 def main(unused_argv):
 
     split_dict = {"train": 0.6, "valid": 0.2, "test": 0.2}
 
-    create_tfrecords(tfrecords_name=FLAGS.name,
-                     datapath_to_examples_fn=build_satsim_dataset,
-                     tf_example_builder=build_satnet_tf_example,
-                     splits_dict=split_dict)
+    if FLAGS.data_bank:
+
+        for file in get_immediate_subdirectories(FLAGS.data_dir):
+
+            input_dir = os.path.join(FLAGS.data_dir, file)
+            output_dir = os.path.join(FLAGS.data_dir, "tfrecords", file)
+
+            make_clean_dir(output_dir)
+
+            create_tfrecords(data_dir=input_dir,
+                             output_dir=output_dir,
+                             examples_per_tfrecord=FLAGS.examples_per_tfrecord,
+                             tfrecords_name=FLAGS.name,
+                             datapath_to_examples_fn=build_satsim_dataset,
+                             tf_example_builder_fn=build_satnet_tf_example,
+                             partition_examples_fn=partition_examples,
+                             splits_dict=split_dict)
+
+    else:
+
+        create_tfrecords(data_dir=FLAGS.data_dir,
+                         output_dir=FLAGS.output_dir,
+                         tfrecords_name=FLAGS.name,
+                         examples_per_tfrecord=FLAGS.examples_per_tfrecord,
+                         datapath_to_examples_fn=build_satsim_dataset,
+                         tf_example_builder_fn=build_satnet_tf_example,
+                         partition_examples_fn=partition_examples,
+                         splits_dict=split_dict)
 
 
 if __name__ == '__main__':
@@ -270,15 +303,17 @@ if __name__ == '__main__':
 
     parser.add_argument('--output_dir', type=str,
                         default="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0",
-                        help='Path to the JSON config for SatSim.')
-
-    parser.add_argument("--input_type",
-                        default="json",
-                        help="One of [pickle_frcnn, pickle_yolo3, json]. Indicates pickle format.")
+                        help='Path to the output directory.')
 
     parser.add_argument("--examples_per_tfrecord",
+                        type=int,
                         default=128,
                         help="Maximum number of examples to write to a file")
+
+    parser.add_argument("--data_bank",
+                        action='store_true',
+                        default=False,
+                        help="If true, make tfrecords for data_dir subdirs")
 
     FLAGS, unparsed = parser.parse_known_args()
 

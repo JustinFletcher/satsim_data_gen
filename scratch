@@ -1,37 +1,71 @@
-source ~/.profile
-conda deactivate
-cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=0 --num_sensors=1 --num_samples=5000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/"
 
 
-
-source ~/.profile
-conda deactivate
-cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=1 --num_sensors=1 --num_samples=5000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/0"
-
+############### Launch SatSim - Cross-Sensor ################
 
 
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=2 --num_sensors=1 --num_samples=5000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/1"
+python sensor_data_producer.py --device=0 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_0" --debug_satsim
 
 
 
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=3 --num_sensors=1 --num_samples=5000 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/2"
-
+python sensor_data_producer.py --device=1 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_1" --debug_satsim
 
 
 
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=1 --num_sensors=8 --num_samples=8 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_micro/"
+python sensor_data_producer.py --device=2 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_2" --debug_satsim
 
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+python sensor_data_producer.py --device=3 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_3" --debug_satsim
+
+
+
+
+############### Launch TFRecord Writer ###############
+
+
+
+ # Iterate over each "sensor_*" director in this directory... 
+    # ...and write out TFRecords to a specified output dir.
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+
+python make_satsim_tfrecords.py --name="sensor_0" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_0" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_0_tfrecords"
+
+python make_satsim_tfrecords.py --name="sensor_1" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_1" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_1_tfrecords"
+
+python make_satsim_tfrecords.py --name="sensor_2" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_2" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_2_tfrecords"
+
+python make_satsim_tfrecords.py --name="sensor_3" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_3" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_3_tfrecords"
+
+python make_satsim_tfrecords.py --name="sensor_4" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_4" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_4_tfrecords"
+
+python make_satsim_tfrecords.py --name="sensor_5" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_5" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_5_tfrecords"
+
+python make_satsim_tfrecords.py --name="sensor_6" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_6" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_6_tfrecords"
+
+python make_satsim_tfrecords.py --name="sensor_7" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_7" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/sensor_7_tfrecords"
+
+
+
+
+
+
+python make_satsim_tfrecords.py --name="satsim_sensor_bank" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny_tfrecords" --data_bank
 
 
 ############### Launch SSD ################
@@ -40,8 +74,14 @@ python sensor_data_producer.py --device=1 --num_sensors=8 --num_samples=8 --outp
 # SSD Trained SatNet, works.
 source ~/.profile
 conda activate tf112-gpu
+conda deactivate
+conda deactivate
 cd ~/research/SSD_Keras
-python train_and_test.py --gpu_list="0" --train_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_train.tfrecords --valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords --test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords --num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satnet_0" --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data
+python train_and_test.py --gpu_list="0" \
+--train_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_train.tfrecords \
+--valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords \
+--test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords \
+--num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28  --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satnet_0" --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data --num_dataset_threads=8 --shuffle_training --cache_in_memory
 
 
 
@@ -49,8 +89,13 @@ python train_and_test.py --gpu_list="0" --train_tfrecord=/home/jfletcher/data/sa
 source ~/.profile
 conda deactivate
 conda activate tf112-gpu
+conda deactivate
+conda deactivate
 cd ~/research/SSD_Keras
-python train_and_test.py --gpu_list="1" --train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/train/ --valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/valid/ --test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/test/ --num_train_images=18000 --num_valid_images=6000 num_test_images=6000--batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_0" --metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/0/sensor_0
+python train_and_test.py --gpu_list="1" --train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/test/ \
+--num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_0" --metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/0/sensor_0 --num_dataset_threads=8 --shuffle_training --cache_in_memory
 
 
 
@@ -58,21 +103,154 @@ python train_and_test.py --gpu_list="1" --train_tfrecord=/home/jfletcher/data/sa
 source ~/.profile
 conda deactivate
 conda activate tf112-gpu
+conda deactivate
+conda deactivate
 cd ~/research/SSD_Keras
-python train_and_test.py --gpu_list="2" --train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/train/ --valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords --test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords  --num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_cv_satnet_0" --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data
+python train_and_test.py --gpu_list="2" \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords \
+--test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords  \
+--num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_cv_satnet_0" --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data --num_dataset_threads=8 --shuffle_training --cache_in_memory
 
+
+
+
+############### Launch TensorBoard ################
 
 
 # Reset and reinstall tf112-gpu
 conda env remove -n tf112-gpu
 conda create -n tf112-gpu tensorflow-gpu=1.12.0
 conda activate tf112-gpu
-pip install pillow
-pip install pandas
-pip install matplotlib
+pip3 install pillow
+pip3 install pandas
+pip3 install matplotlib
 
 # Tensorboard
 source ~/.profile
 conda activate tf112-gpu
-tensorboard --logdir=.
+tensorboard --logdir=. --update_freq="batch"
+
+
+
+############### SatSim Validation Experiments ################
+
+# sensor_0 cv sensor_0
+# sensor_1 cv sensor_1
+# sensor_2 cv sensor_2
+# sensor_3 cv sensor_3
+# sensor_4 cv sensor_4
+
+
+# (sensor_0, sensor_1) cv (sensor_0, sensor_1)
+# (sensor_2, sensor_3) cv (sensor_2, sensor_3)
+# (sensor_4, sensor_5) cv (sensor_4, sensor_5)
+# (sensor_6, sensor_7) cv (sensor_6, sensor_7)
+# (sensor_8, sensor_9) cv (sensor_8, sensor_9)
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3)     cv (sensor_0, sensor_1, sensor_2, sensor_3)
+# (sensor_0, sensor_1, sensor_2, sensor_3)     cv (sensor_0, sensor_1, sensor_2, sensor_3)
+# (sensor_4, sensor_5, sensor_6, sensor_7)     cv (sensor_4, sensor_5, sensor_6, sensor_7)
+# (sensor_8, sensor_9, sensor_10, sensor_11)   cv (sensor_8, sensor_9, sensor_10, sensor_11)
+# (sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_12, sensor_13, sensor_14, sensor_15)
+
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7)       cv (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7) 
+# (sensor_15, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7)      cv (sensor_15, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7)  
+# (sensor_14, sensor_15, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6)     cv (sensor_14, sensor_15, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6)
+# (sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15)
+# (sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14)  cv (sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14)
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15)
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15)
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15)
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15)
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15)
+
+
+
+############### SatSim Cross Validation Experiments ################
+
+# sensor_0 cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# sensor_1 cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# sensor_2 cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# sensor_3 cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# sensor_4 cv (sensor_16, sensor_17, sensor_18, sensor_19)
+
+
+# (sensor_0, sensor_1) cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_2, sensor_3) cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_4, sensor_5) cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_6, sensor_7) cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_8, sensor_9) cv (sensor_16, sensor_17, sensor_18, sensor_19)
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3)     cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_4, sensor_5, sensor_6, sensor_7)     cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_8, sensor_9, sensor_10, sensor_11)   cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_0, sensor_1, sensor_2, sensor_3)     cv (sensor_16, sensor_17, sensor_18, sensor_19)
+
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7)       cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_15, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7)      cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_14, sensor_15, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6)     cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_16, sensor_17, sensor_18, sensor_19)
+# (sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14)  cv (sensor_16, sensor_17, sensor_18, sensor_19)
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_16, sensor_17, sensor_18, sensor_19) 
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_16, sensor_17, sensor_18, sensor_19) 
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_16, sensor_17, sensor_18, sensor_19) 
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_16, sensor_17, sensor_18, sensor_19) 
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv (sensor_16, sensor_17, sensor_18, sensor_19) 
+
+
+############### SatNet Cross Validation Experiments ################
+
+# sensor_0 cv SatNet
+# sensor_1 cv SatNet
+# sensor_2 cv SatNet
+# sensor_3 cv SatNet
+# sensor_4 cv SatNet
+
+
+# (sensor_0, sensor_1) cv SatNet
+# (sensor_2, sensor_3) cv SatNet
+# (sensor_4, sensor_5) cv SatNet
+# (sensor_6, sensor_7) cv SatNet
+# (sensor_8, sensor_9) cv SatNet
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3)     cv SatNet
+# (sensor_4, sensor_5, sensor_6, sensor_7)     cv SatNet
+# (sensor_8, sensor_9, sensor_10, sensor_11)   cv SatNet
+# (sensor_12, sensor_13, sensor_14, sensor_15) cv SatNet
+# (sensor_0, sensor_1, sensor_2, sensor_3)     cv SatNet
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7)       cv SatNet
+# (sensor_15, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7)      cv SatNet
+# (sensor_14, sensor_15, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6)     cv SatNet
+# (sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv SatNet
+# (sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14)  cv SatNet
+
+
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv SatNet
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv SatNet
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv SatNet
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv SatNet
+# (sensor_0, sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13, sensor_14, sensor_15) cv SatNet
+
+
+
+
+
+
+
+
 

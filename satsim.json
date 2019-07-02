@@ -43,7 +43,7 @@
                 { "exposure": 4.0, "gap": 0.1 }
             ]
         },
-        "num_frames": 6
+        "num_frames": 1
     },
     "background": {
         "stray": {

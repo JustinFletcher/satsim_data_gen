@@ -21,7 +21,7 @@ import tensorflow as tf
 # I am launched on a node with one param: num_samples
 
 
-def build_sensor_config(num_samples, base_config_dict):
+def build_sensor_config(num_samples, num_frames_per_sample, base_config_dict):
 
     config_dict = base_config_dict
 
@@ -72,6 +72,8 @@ def build_sensor_config(num_samples, base_config_dict):
     time_dict["gap"] = np.random.uniform(0.1, 1)
     fpa_dict["time"] = time_dict
 
+    fpa_dict["num_frames"] = num_frames_per_sample
+
     # Set the FPA.
     config_dict['fpa'] = fpa_dict
 
@@ -97,7 +99,9 @@ def main(**kwargs):
     # Generate a new config file randomly selecting from an FPA config.
     for sensor_num in range(FLAGS.num_sensors):
 
-        config_dict = build_sensor_config(FLAGS.num_samples, base_config_dict)
+        config_dict = build_sensor_config(FLAGS.num_samples,
+                                          FLAGS.num_frames_per_sample,
+                                          base_config_dict)
 
         # Create a directory for this sensors runs.
         sensor_name_str = "sensor_" + str(sensor_num)
@@ -115,7 +119,13 @@ def main(**kwargs):
 
             json.dump(config_dict, fp)
 
-        cmd_str = "satsim --debug DEBUG run --device " + str(FLAGS.device) + " --mode eager --output_dir " + sensor_dir + " " + output_config_file
+        if FLAGS.debug_satsim:
+
+            cmd_str = "satsim --debug DEBUG run --device " + str(FLAGS.device) + " --mode eager --output_dir " + sensor_dir + " " + output_config_file
+
+        else:
+
+            cmd_str = "satsim run --device " + str(FLAGS.device) + " --mode eager --output_dir " + sensor_dir + " " + output_config_file
 
         cmd_strings.append(cmd_str)
 
@@ -160,6 +170,10 @@ if __name__ == '__main__':
                         default=8,
                         help='The number of samples from each sensor.')
 
+    parser.add_argument('--num_frames_per_sample', type=int,
+                        default=1,
+                        help='The number of samples from each sensor.')
+
     parser.add_argument('--num_frames', type=int,
                         default=6,
                         help='The number of frames to use in each sequence.')
@@ -167,6 +181,10 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=int,
                         default=0,
                         help='Number of the GPU use.')
+
+    parser.add_argument('--debug_satsim', action='store_true',
+                        default=False,
+                        help='If true, write annotated JPEGs to disk.')
 
     FLAGS = parser.parse_args()
 
