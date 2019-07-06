@@ -93,7 +93,6 @@ def get_immediate_subdirectories(a_dir):
     """
 
     return [name for name in os.listdir(a_dir)
-
             if os.path.isdir(os.path.join(a_dir, name))]
 
 
@@ -141,9 +140,12 @@ def launch_satsim_run(output_dir,
 def populate_needed_samples(needed_samples_dict,
                             device=0,
                             debug_satsim=True,
+                            min_elements=1,
                             fill_fraction=1.0):
 
     for sensor_dir_path, num_elements_needed in needed_samples_dict.items():
+
+        print("Sensor at " + sensor_dir_path + " needs " + str(num_elements_needed))
 
         # Check if more examples are needed form this sensor; if so, make them.
         if num_elements_needed > 0:
@@ -175,11 +177,14 @@ def populate_needed_samples(needed_samples_dict,
 
             # Select a fraction os the needed samples to make; make at least 1.
             num_elements_needed = int(num_elements_needed * fill_fraction)
-            num_elements_needed = int(np.max([num_elements_needed, 1.0]))
+            num_elements_needed = int(np.max([num_elements_needed,
+                                              min_elements]))
 
             print("I'm going to produce " + str(num_elements_needed))
 
-            sensor_config_dict["samples"] = num_elements_needed
+            sensor_config_dict["sim"]["samples"] = num_elements_needed
+
+            print(sensor_config_dict)
 
             # Write a JSON file in the new dir.
             with open(sensor_config_file_path, 'w') as fp:
@@ -201,6 +206,8 @@ def main(**kwargs):
         needed_samples_dict = compute_needed_samples(FLAGS.data_bank_dir,
                                                      FLAGS.num_samples)
 
+        # print(needed_samples_dict)
+
         # So long as there are sensors that need completion, complete them.
         while sum(np.array(list(needed_samples_dict.values())).clip(0)) > 0:
 
@@ -211,6 +218,7 @@ def main(**kwargs):
             # Then, populate some or all those samples.
             populate_needed_samples(needed_samples_dict,
                                     device=FLAGS.device,
+                                    min_elements=FLAGS.min_elements,
                                     debug_satsim=FLAGS.debug_satsim,
                                     fill_fraction=FLAGS.fill_fraction)
 
@@ -220,7 +228,7 @@ def main(**kwargs):
             # Read the base config file which randomizes over other properties.
             base_config_dict = json.load(f)
 
-        # Build a new randomized config dict for this sensor; 
+        # Build a new randomized config dict for this sensor;
         config_dict = build_sensor_config(1,
                                           FLAGS.num_frames_per_sample,
                                           base_config_dict)
@@ -279,8 +287,12 @@ if __name__ == '__main__':
                         help='Number of the GPU use.')
 
     parser.add_argument('--fill_fraction', type=float,
-                        default=0.25,
+                        default=0.1,
                         help='A float in (0, 1] tunes sample production goal.')
+
+    parser.add_argument('--min_elements', type=int,
+                        default=1,
+                        help='An int determining the smallest run size.')
 
     parser.add_argument('--debug_satsim', action='store_true',
                         default=False,

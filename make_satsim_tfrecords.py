@@ -123,9 +123,7 @@ def get_immediate_subdirectories(a_dir):
     Shift+CV from SO
     """
 
-    return [name for name in os.listdir(a_dir)
-
-            if os.path.isdir(os.path.join(a_dir, name))]
+    return [name for name in os.listdir(a_dir) if os.path.isdir(os.path.join(a_dir, name))]
 
 
 def build_satsim_dataset(datapath):
@@ -264,7 +262,7 @@ def main(unused_argv):
         for file in get_immediate_subdirectories(FLAGS.data_dir):
 
             input_dir = os.path.join(FLAGS.data_dir, file)
-            output_dir = os.path.join(FLAGS.data_dir, "tfrecords", file)
+            output_dir = os.path.join(FLAGS.output_dir, "tfrecords", file)
 
             make_clean_dir(output_dir)
 
