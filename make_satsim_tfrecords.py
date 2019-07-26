@@ -296,7 +296,7 @@ def build_satsim_multiframe_dataset(datapath):
             sequence_id = annotations["file"]["sequence_id"]
             dir_name = annotations["file"]["dirname"]
 
-            example_name = os.path.join(dir_name, sequence[0])
+            example_name = os.path.join(dir_name.encode(), sequence[0])
             if example_name not in examples_dict:
                 # We've never seen this one before, so add the structure
                 blank_list = []
