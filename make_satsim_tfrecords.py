@@ -121,7 +121,7 @@ def build_satnet_tf_example(example):
     return(example)
 
 
-def build_satnet_multiframe_tf_example(example_sequence):
+def build_satsim_multiframe_tf_example(example_sequence):
     sequence_images = []
     sequence_filenames = []
     sequence_classes = []
@@ -140,10 +140,10 @@ def build_satnet_multiframe_tf_example(example_sequence):
         fp.close()
 
         class_id = [obj["class_id"] for obj in annotations["objects"]]
-        y_min = [obj["y_min"] for obj in annotations["objects"]]
-        y_max = [obj["y_max"] for obj in annotations["objects"]]
-        x_min = [obj["x_min"] for obj in annotations["objects"]]
-        x_max = [obj["x_max"] for obj in annotations["objects"]]
+        y_min = [obj["y_min"] - 0.02 for obj in annotations["objects"]]
+        y_max = [obj["y_max"] + 0.02 for obj in annotations["objects"]]
+        x_min = [obj["x_min"] - 0.02 for obj in annotations["objects"]]
+        x_max = [obj["x_max"] + 0.02 for obj in annotations["objects"]]
 
         dir_name = annotations["file"]["dirname"]
         file_name = annotations["file"]["filename"]
@@ -419,7 +419,7 @@ def main(unused_argv):
 
     if FLAGS.multiframe:
         datapath_fn = build_satsim_multiframe_dataset
-        example_builder_fn = build_satnet_multiframe_tf_example
+        example_builder_fn = build_satsim_multiframe_tf_example
     else:
         datapath_fn = build_satsim_dataset
         example_builder_fn = build_satnet_tf_example
