@@ -2,66 +2,107 @@
 
 ############### Launch SatSim - Cross-Sensor ################
 
-
-source ~/.profile
-conda deactivate
-cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=0 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_0" --debug_satsim
-
-
-
-source ~/.profile
-conda deactivate
-cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=1 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_1" --debug_satsim
-
-
-
-source ~/.profile
-conda deactivate
-cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=2 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_2" --debug_satsim
-
-
-
-source ~/.profile
-conda deactivate
-cd ~/research/satsim_data_gen/
-python sensor_data_producer.py --device=3 --num_sensors=1 --num_samples=5000 --num_frames_per_sample=6 --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/run_3" --debug_satsim
-
-
 # Daemon
 
 
+# Device 0
 
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_bank_daemon.py --device=0 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim
-
-
-
-
-source ~/.profile
-conda deactivate
-cd ~/research/satsim_data_gen/
-python sensor_bank_daemon.py --device=1 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim
-
-
+nohup python sensor_bank_daemon.py --device=0 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_1.out &
 
 
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_bank_daemon.py --device=2 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim
+nohup python sensor_bank_daemon.py --device=0 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_2.out &
 
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=0 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_3.out &
+
+
+# Device 1
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=1 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_4.out &
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=1 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_5.out &
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=1 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_6.out &
+
+
+# Device 2
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=2 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_7.out &
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=2 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_8.out &
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=2 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_9.out &
+
+
+
+# Device 3
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=3 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_10.out &
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=3 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_11.out &
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+nohup python sensor_bank_daemon.py --device=3 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim &> ~/log_12.out &
+
+
+# Monitor
+
+
+watch "nvidia-smi && python sensor_bank_monitor_daemon.py --data_bank_dir=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/"
 
 
 
 source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
-python sensor_bank_daemon.py --device=3 --num_samples=5000 --num_frames_per_sample=6 --data_bank_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --debug_satsim
+
+watch "nvidia-smi && python sensor_bank_monitor_daemon.py --data_bank_dir=/raid/jfletcher_data/satnet_v2_sensor_generalization/sensor_bank/six_frame"
+
+
 
 
 
@@ -73,23 +114,63 @@ source ~/.profile
 conda deactivate
 cd ~/research/satsim_data_gen/
 
-python make_satsim_tfrecords.py --name="satsim_sensor_bank" --examples_per_tfrecord=8 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny/" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization_sample_bank_tiny_tfrecords" --data_bank
+python make_satsim_tfrecords.py --name="satsim_sensor_bank" --examples_per_tfrecord=512 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/" --data_bank
+
+
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+
+python make_satsim_tfrecords.py --name="satsim_sensor_bank" --examples_per_tfrecord=512 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --output_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords_box_size_adjusted/" --data_bank
+
+
+# Test run...
+source ~/.profile
+conda deactivate
+cd ~/research/satsim_data_gen/
+
+python make_satsim_tfrecords.py --name="satsim_sensor_bank" --examples_per_tfrecord=512 --data_dir="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/" --output_dir="/home/jfletcher/temp/" --data_bank
+
+
+
+############### Launch TFRecord Config Generator ###############
+
+source ~/.profile
+conda deactivate
+cd ~/research/satnet_v2_sensor_generalization/
+
+python training_config_generator.py --output_dir=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/multisensor_configs/ --data_bank_dir=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/
+
+
 
 
 ############### Launch SSD ################
 
 
-# SSD Trained SatNet, works.
+# SSD Trained SatNet, works, debug.
 source ~/.profile
 conda activate tf112-gpu
 conda deactivate
 conda deactivate
 cd ~/research/SSD_Keras
-python train_and_test.py --gpu_list="0" \
+python train_and_test.py --gpu_list="0" --num_train_images=180 --num_valid_images=60 num_test_images=60 --batch_size=28  --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satnet_0"--num_dataset_threads=8 --shuffle_training --cache_in_memory \
+ --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data \
 --train_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_train.tfrecords \
 --valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords \
 --test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords \
---num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28  --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satnet_0" --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data --num_dataset_threads=8 --shuffle_training --cache_in_memory
+
+
+# SSD Trained SatNet, works.
+source ~/.profile
+conda activate tf112-gpu
+conda deactivate`
+conda deactivate
+cd ~/research/SSD_Keras
+python train_and_test.py --gpu_list="0" --num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=16  --infer_batch_size=16 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satnet_0" --num_dataset_threads=8 --shuffle_training --cache_in_memory \
+ --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data \
+--train_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_train.tfrecords \
+--valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords \
+--test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords \
 
 
 
@@ -100,10 +181,11 @@ conda activate tf112-gpu
 conda deactivate
 conda deactivate
 cd ~/research/SSD_Keras
-python train_and_test.py --gpu_list="1" --train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/train/ \
---valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/valid/ \
---test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/test/ \
---num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_0" --metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/0/sensor_0 --num_dataset_threads=8 --shuffle_training --cache_in_memory
+python train_and_test.py --gpu_list="1" --num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_0" --num_dataset_threads=8 --shuffle_training --cache_in_memory \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/sensor_1/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/sensor_1/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/sensor_1/test/
 
 
 
@@ -114,11 +196,83 @@ conda activate tf112-gpu
 conda deactivate
 conda deactivate
 cd ~/research/SSD_Keras
-python train_and_test.py --gpu_list="2" \
+python train_and_test.py --gpu_list="2" --num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_cv_satnet_0" --shuffle_training --cache_in_memory \
+--metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data --num_dataset_threads=8 \
 --train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/tfrecords/0/train/ \
 --valid_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_valid.tfrecords \
 --test_tfrecord=/home/jfletcher/data/satnet/tfrecords/SatNet.v.1.0.0.0/unfiltered_single_frame/satnet_full_singleframes_v1_0_0_test.tfrecords  \
---num_train_images=18000 --num_valid_images=6000 num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="ssd_on_satsim_cv_satnet_0" --metadata_path=/opt/tfrecords/SatNet.v.1.0.0.0/SatNet/data --num_dataset_threads=8 --shuffle_training --cache_in_memory
+
+
+
+
+
+
+############### Launch YOLOv3 ################
+
+
+# YOLO Trained SatSim, sensor bank.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="1" --num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=200 --use_tensorboard --run_name="yolo_on_satsim_0" --num_dataset_threads=8 --num_predictor_heads=1 --base_model_name="DarkNet" --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/test/
+
+
+
+# YOLO Trained SatSim, multi-sensor config 16.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="1" --num_train_images=36000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=200 --use_tensorboard --run_name="yolo_on_satsim_0" --num_dataset_threads=8 --num_predictor_heads=1 --base_model_name="DarkNet" --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/multisensor_configs/train_config_16.json \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/multisensor_configs/valid_config_16.json \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/multisensor_configs/test_config_16.json
+
+
+
+
+
+# YOLOv3, sensor bank small.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="1" --num_train_images=180 --num_valid_images=60 --num_test_images=60 --batch_size=28 --infer_batch_size=28 --num_training_epochs=10 --use_tensorboard --run_name="yolo_on_satsim_0" --num_dataset_threads=8 --base_model_name="DarkNet"  --num_predictor_heads=1 --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/test/
+
+
+# YOLOv3, sensor bank all.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="2" --num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=100000 --use_tensorboard --run_name="yolo_on_satsim_encoder_mod" --num_dataset_threads=32 --base_model_name="DarkNet" --num_predictor_heads=1 --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/test/
+
+
+
+# YOLOv3, sensor bank tiny debug evaluate.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="1" --num_train_images=56 --num_valid_images=28 --num_test_images=2 --batch_size=28 --infer_batch_size=2 --num_training_epochs=2 --run_name="yolo_on_satsim_eval_debug" --num_dataset_threads=8 --base_model_name="DarkNet" --num_predictor_heads=1 --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/test/
 
 
 
@@ -140,6 +294,120 @@ conda activate tf112-gpu
 tensorboard --logdir=. --update_freq="batch"
 
 
+############### Launch Load and Test ################
+
+# YOLOv3, load and test against SatSim
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python load_and_test.py --gpu_list="1" --num_test_images=60 --infer_batch_size=30 --use_tensorboard --run_name="load_and_test_yolo3_0" --num_dataset_threads=8 --num_predictor_heads=1 --shuffle_training --cache_in_memory --use_tensorboard \
+--checkpoint_path=/home/jfletcher/logs/checkpoints/yolo_satnet_11_sota/weights_DarkNet_yolo_satnet_11_sota.h5 \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--evaluate_file_path=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satsim_1/ \
+--evaluate_filename=yolo_satnet_11_sota_vs_satsim_1.json \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/test/
+
+
+# YOLOv3, load and test against SatSim
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python load_and_test.py --gpu_list="1" --num_test_images=60 --infer_batch_size=28 --use_tensorboard --run_name="load_and_test_yolo3_0" --num_dataset_threads=8 --num_predictor_heads=1 --shuffle_training --cache_in_memory --use_tensorboard \
+--checkpoint_path=/home/jfletcher/logs/checkpoints/yolo_satnet_11_sota/weights_DarkNet_yolo_satnet_11_sota.h5 \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--evaluate_file_path=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satsim_1_valid/ \
+--evaluate_filename=yolo_satnet_11_sota_vs_satsim_1_valid.json \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/valid/
+
+
+# YOLOv3, load and test against SatSim
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python load_and_test.py --gpu_list="1" --num_test_images=60 --infer_batch_size=28 --use_tensorboard --run_name="load_and_test_yolo3_0" --num_dataset_threads=8 --num_predictor_heads=1 --shuffle_training --cache_in_memory --use_tensorboard \
+--checkpoint_path=/home/jfletcher/logs/checkpoints/yolo_satnet_11_sota/weights_DarkNet_yolo_satnet_11_sota.h5 \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--evaluate_file_path=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satsim_1_valid/ \
+--evaluate_filename=yolo_satnet_11_sota_vs_satsim_1_valid.json \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/valid/
+
+
+
+
+
+# YOLOv3, load and test against SatNet
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python load_and_test.py --gpu_list="1" --num_test_images=10410 --infer_batch_size=28 --use_tensorboard --run_name="load_and_test_yolo3_satnet_0" --num_dataset_threads=8 --num_predictor_heads=1 --shuffle_training --cache_in_memory --use_tensorboard \
+--checkpoint_path=/home/jfletcher/logs/checkpoints/yolo_satnet_11_sota/weights_DarkNet_yolo_satnet_11_sota.h5 \
+--metadata_path=/opt/tfrecords/SatNet.v.1.1.0.0/SatNet/data/ \
+--evaluate_file_path=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satnet_11/ \
+--evaluate_filename=yolo_satnet_11_sota_vs_satnet_11.json \
+--test_tfrecord=/opt/tfrecords/test.tfrecords
+
+
+
+
+
+
+
+
+############### Launch Object Detection Analysis ################
+
+
+
+# Satsim, Refactor.
+source ~/.profile
+conda deactivate
+cd ~/research/YOLOv3_Keras/utils/
+python object_detection_analysis_refactor.py --input_file=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satsim_1/yolo_satnet_11_sota_vs_satsim_1.json --fit_thresh=32.0
+
+
+
+# Satsim, Vanilla.
+source ~/.profile
+conda deactivate
+cd ~/research/YOLOv3_Keras/utils/
+python object_detection_analysis.py --input_file=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satsim_1/yolo_satnet_11_sota_vs_satsim_1.json --metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ --l2n_thresh=32.0
+
+
+#####
+
+# Satsim all valid, Refactor.
+source ~/.profile
+conda deactivate
+cd ~/research/YOLOv3_Keras/utils/
+python object_detection_analysis_refactor.py --input_file=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satsim_1_valid/yolo_satnet_11_sota_vs_satsim_1_valid.json --fit_thresh=32.0
+
+
+
+# Satsim all valid, Vanilla.
+source ~/.profile
+conda deactivate
+cd ~/research/YOLOv3_Keras/utils/
+python object_detection_analysis.py --input_file=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satsim_1_valid/yolo_satnet_11_sota_vs_satsim_1.json_valid --metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ --l2n_thresh=32.0
+
+####
+
+# Satnet, Refactor.
+source ~/.profile
+conda deactivate
+cd ~/research/YOLOv3_Keras/utils/
+python object_detection_analysis_refactor.py --input_file=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satnet_11/yolo_satnet_11_sota_vs_satnet_11.json  --fit_thresh=32.0
+
+
+# Satnet, Vanilla.
+source ~/.profile
+conda deactivate
+cd ~/research/YOLOv3_Keras/utils/
+python object_detection_analysis.py --input_file=/home/jfletcher/logs/model_evaluation/yolo_satnet_11_sota_vs_satnet_11/yolo_satnet_11_sota_vs_satnet_11.json --metadata_path=/opt/tfrecords/SatNet.v.1.1.0.0/SatNet/data/ --l2n_thresh=32.0
+
+
 
 ############### SatSim Validation Experiments ################
 
@@ -148,6 +416,73 @@ tensorboard --logdir=. --update_freq="batch"
 # sensor_2 cv sensor_2
 # sensor_3 cv sensor_3
 # sensor_4 cv sensor_4
+
+
+# YOLO Trained SatSim, sensor bank.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="0" --num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=200 --use_tensorboard --num_dataset_threads=8 --base_model_name="DarkNet" --num_predictor_heads=1 --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_0/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_0/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_0/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_0/test/ --run_name="yolo_on_satsim_sensor_0"
+
+
+
+# YOLO Trained SatSim, sensor bank.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="1" --num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=200 --use_tensorboard --num_dataset_threads=8 --base_model_name="DarkNet" --num_predictor_heads=1  --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_1/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_1/test/ --run_name="yolo_on_satsim_sensor_1_postfix" 
+
+
+
+# YOLO Trained SatSim, sensor bank.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="2" --num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=200 --use_tensorboard --num_dataset_threads=8 --base_model_name="DarkNet" --num_predictor_heads=1  --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_2/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_2/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_2/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_2/test/ --run_name="yolo_on_satsim_sensor_2" 
+
+
+
+# YOLO Trained SatSim, sensor bank.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="3" --num_train_images=18000 --num_valid_images=6000 --num_test_images=6000 --batch_size=28 --infer_batch_size=28 --num_training_epochs=200 --use_tensorboard --num_dataset_threads=8 --base_model_name="DarkNet" --num_predictor_heads=1  --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_3/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_3/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_3/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_3/test/ --run_name="yolo_on_satsim_sensor_3"
+
+
+
+
+
+# TINY YOLO Trained SatSim, sensor bank.
+source ~/.profile
+conda deactivate
+
+cd ~/research/YOLOv3_Keras
+python train_and_test.py --gpu_list="3" --num_train_images=180 --num_valid_images=60 --num_test_images=60 --batch_size=28 --infer_batch_size=28 --num_training_epochs=200 --use_tensorboard --num_dataset_threads=8 --base_model_name="DarkNet" --num_predictor_heads=1  --shuffle_training --cache_in_memory --use_tensorboard \
+--metadata_path=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame/sensor_3/ \
+--train_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_3/train/ \
+--valid_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_3/valid/ \
+--test_tfrecord=/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank/six_frame_tfrecords/tfrecords/sensor_3/test/ --run_name="yolo_on_satsim_sensor_3debug" 
+
 
 
 # (sensor_0, sensor_1) cv (sensor_0, sensor_1)
