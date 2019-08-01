@@ -370,6 +370,7 @@ def partition_examples_by_file(examples, split_file_dir):
         partition_examples = []
         for example in examples:
             full_dir, file_name = os.path.split(example[0])
+            full_dir, _ = os.path.split(full_dir)
             _, collect_dir = os.path.split(full_dir)
             example_path = os.path.join(collect_dir, file_name)
             print("example_path = " + str(example_path))
