@@ -6,15 +6,18 @@ Date: 23 March 2019
 """
 
 import os
+
 import json
+
 import shutil
 
 import argparse
 
-import astropy.io.fits
-import tensorflow as tf
 import numpy as np
 
+import astropy.io.fits
+
+import tensorflow as tf
 
 from itertools import islice, zip_longest
 
@@ -81,10 +84,10 @@ def build_satnet_tf_example(example):
     sequence = [file.encode() for file in annotations["file"]["sequence"]]
     class_name = [obj["class_name"].encode() for obj in annotations["objects"]]
     class_id = [obj["class_id"] for obj in annotations["objects"]]
-    y_min = [obj["y_min"] for obj in annotations["objects"]]
-    y_max = [obj["y_max"] for obj in annotations["objects"]]
-    x_min = [obj["x_min"] for obj in annotations["objects"]]
-    x_max = [obj["x_max"] for obj in annotations["objects"]]
+    y_min = [obj["y_min"] - 0.02 for obj in annotations["objects"]]
+    y_max = [obj["y_max"] + 0.02 for obj in annotations["objects"]]
+    x_min = [obj["x_min"] - 0.02 for obj in annotations["objects"]]
+    x_max = [obj["x_max"] + 0.02 for obj in annotations["objects"]]
     source = [obj["source"].encode() for obj in annotations["objects"]]
     magnitude = [obj["magnitude"] for obj in annotations["objects"]]
 
@@ -231,7 +234,6 @@ def get_immediate_subdirectories(a_dir):
     """
     Shift+CV from SO
     """
-
     return [name for name in os.listdir(a_dir) if os.path.isdir(os.path.join(a_dir, name))]
 
 
@@ -244,7 +246,7 @@ def build_satsim_dataset(datapath):
 
     for directory_name in get_immediate_subdirectories(datapath):
 
-        print(directory_name)
+        # print(directory_name)
 
         colleciton_path = os.path.join(datapath, directory_name)
         image_dir_path = os.path.join(colleciton_path, "ImageFiles")
@@ -318,6 +320,8 @@ def build_satsim_multiframe_dataset(datapath):
 
 def partition_examples(examples, splits_dict):
 
+    # TODO: Print examples here and see if they are sequential...
+
     # Create a dict to hold examples.
     partitions = dict()
 
@@ -327,7 +331,7 @@ def partition_examples(examples, splits_dict):
     # Iterate over the items specifying the partitions.
     for (split_name, split_fraction) in splits_dict.items():
 
-        # Compute the sixe of this parition.
+        # Compute the size of this parition.
         num_split_examples = int(split_fraction * num_examples)
 
         # Pop the next partition elements.
