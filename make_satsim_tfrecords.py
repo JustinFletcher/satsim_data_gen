@@ -355,9 +355,6 @@ def partition_examples_by_file(examples, split_file_dir):
         if split_file.endswith(".txt"):
             dir_contents.append(split_file)
 
-    # TODO: remove me
-    dir_contents = ["train.txt"]
-
     for split_file_name in dir_contents:
         # Get the name of this split (remove the extension)
         split_name = split_file_name.split(".")[0]
