@@ -367,24 +367,25 @@ def partition_examples_by_file(examples, split_file_dir):
             split_paths.append(new_path)
 
         # Now check and see which examples belong in this split
-        partition_examples = []
+        split_examples = []
         for example in examples:
             full_dir, file_name = os.path.split(example[0])
             full_dir, _ = os.path.split(full_dir)
             _, collect_dir = os.path.split(full_dir)
             example_path = os.path.join(collect_dir, file_name)
-            print("example_path = " + str(example_path))
-            print("type(example_path) = " + str(type(example_path)))
-            print("split_paths[0] = " + str(split_paths[0]))
-            print("type(split_paths[0]) = " + str(type(split_paths[0])))
-            print("split_paths[1] = " + str(split_paths[1]))
-            print("type(split_paths[1]) = " + str(type(split_paths[1])))
+            # print("example_path = " + str(example_path))
+            # print("type(example_path) = " + str(type(example_path)))
+            # print("split_paths[0] = " + str(split_paths[0]))
+            # print("type(split_paths[0]) = " + str(type(split_paths[0])))
+            # print("split_paths[1] = " + str(split_paths[1]))
+            # print("type(split_paths[1]) = " + str(type(split_paths[1])))
             if example_path in split_paths:
-                partition_examples.append(example)
+                print("MATCH!")
+                split_examples.append(example)
 
         # Save this split away in our return dictionary
-        print("Saving partition " + str(split_name) + " with " + str(len(partition_examples)) + " examples.")
-        partitions[split_name] = partition_examples
+        print("Saving partition " + str(split_name) + " with " + str(len(split_examples)) + " examples.")
+        partitions[split_name] = split_examples
     return partitions
 
 
