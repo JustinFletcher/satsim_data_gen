@@ -77,6 +77,7 @@ def build_satnet_tf_example(example):
     # Read in the files for this example
     image = read_fits(image_path)
 
+    print("annotation_path = " + str(annotation_path))
     fp = open(annotation_path, "r")
     annotations = json.load(fp)["data"]
     fp.close()
@@ -353,6 +354,9 @@ def partition_examples_by_file(examples, split_file_dir):
     for split_file in os.listdir(split_file_dir):
         if split_file.endswith(".txt"):
             dir_contents.append(split_file)
+
+    # TODO: remove me
+    dir_contents = ["train.txt"]
 
     for split_file_name in dir_contents:
         # Get the name of this split (remove the extension)
