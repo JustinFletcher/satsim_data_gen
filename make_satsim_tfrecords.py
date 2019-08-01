@@ -340,6 +340,43 @@ def partition_examples(examples, splits_dict):
     return(partitions)
 
 
+def partition_examples_by_file(examples, split_file_dir):
+    # Create a dict to hold examples.
+    partitions = dict()
+
+    # Need to read in the splits files
+    dir_contents = os.listdir(split_file_dir)
+    for split_file_name in dir_contents:
+        # Get the name of this split (remove the extension)
+        split_name = split_file_name.split(".")[0]
+
+        # Pull the file contents into memory
+        split_file_path = os.path.join(split_file_dir, split_file_name)
+        fp = open(split_file_path, "r")
+        file_contents = fp.readlines()[:-1]  # Lose the trailing line
+        fp.close()
+
+        split_paths = list()
+        for line in file_contents:
+            new_path = os.path.join(line.split("_")[0],
+                                    "_".join(line.split("_")[1:]))
+            split_paths.append(new_path)
+
+        # Now check and see which examples belong in this split
+        partition_examples = []
+        for example in examples:
+            full_dir, file_name = os.path.split(example[0])
+            _, collect_dir = os.path.split(full_dir)
+            example_path = os.path.join(collect_dir, file_name)
+            if example_path in split_paths:
+                partition_examples.append(example)
+
+        # Save this split away in our return dictionary
+        print("Saving partition " + str(split_name) + " with " + str(len(partition_examples)) + " examples.")
+        partitions[split_name] = partition_examples
+    return partitions
+
+
 def create_tfrecords(data_dir,
                      output_dir,
                      tfrecords_name="tfrecords",
@@ -415,7 +452,14 @@ def get_dir_content_paths(directory):
 
 def main(unused_argv):
 
-    split_dict = {"train": 0.6, "valid": 0.2, "test": 0.2}
+    if FLAGS.splits_files_path:
+        # If one desires a deterministic split
+        split_dict = FLAGS.splits_files_path
+        partition_fn = partition_examples_by_file
+    else:
+        # Standard randomized split
+        split_dict = {"train": 0.6, "valid": 0.2, "test": 0.2}
+        partition_fn = partition_examples
 
     if FLAGS.multiframe:
         datapath_fn = build_satsim_multiframe_dataset
@@ -439,7 +483,7 @@ def main(unused_argv):
                              tfrecords_name=FLAGS.name,
                              datapath_to_examples_fn=datapath_fn,
                              tf_example_builder_fn=example_builder_fn,
-                             partition_examples_fn=partition_examples,
+                             partition_examples_fn=partition_fn,
                              splits_dict=split_dict)
 
     else:
@@ -450,7 +494,7 @@ def main(unused_argv):
                          examples_per_tfrecord=FLAGS.examples_per_tfrecord,
                          datapath_to_examples_fn=datapath_fn,
                          tf_example_builder_fn=example_builder_fn,
-                         partition_examples_fn=partition_examples,
+                         partition_examples_fn=partition_fn,
                          splits_dict=split_dict)
 
 
@@ -484,6 +528,10 @@ if __name__ == '__main__':
                         action='store_true',
                         default=False,
                         help="If true, make tfrecords multiframe per example")
+
+    parser.add_argument("--splits_files_path", type=str,
+                        default=None,
+                        help="Path to splits files, if one wants to make their splits deterministic")
 
     FLAGS, unparsed = parser.parse_known_args()
 
