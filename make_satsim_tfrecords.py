@@ -77,6 +77,10 @@ def build_satnet_tf_example(example, pad_for_satsim=False):
     # Read in the files for this example
     image = read_fits(image_path)
 
+    if not annotation_path.endswith(".json"):
+        print("image_path = " + str(image_path))
+        print("annotation_path = " + str(annotation_path))
+
     fp = open(annotation_path, "r")
     annotations = json.load(fp)["data"]
     fp.close()
