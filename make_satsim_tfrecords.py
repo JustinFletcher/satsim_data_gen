@@ -259,9 +259,6 @@ def build_satsim_dataset(datapath):
     examples = list()
 
     for directory_name in get_immediate_subdirectories(datapath):
-
-        # print(directory_name)
-
         colleciton_path = os.path.join(datapath, directory_name)
         image_dir_path = os.path.join(colleciton_path, "ImageFiles")
         annotation_dir_path = os.path.join(colleciton_path, "Annotations")
@@ -289,9 +286,6 @@ def build_satsim_multiframe_dataset(datapath):
     examples = list()
 
     for directory_name in get_immediate_subdirectories(datapath):
-
-        print(directory_name)
-
         colleciton_path = os.path.join(datapath, directory_name)
         image_dir_path = os.path.join(colleciton_path, "ImageFiles")
         annotation_dir_path = os.path.join(colleciton_path, "Annotations")
