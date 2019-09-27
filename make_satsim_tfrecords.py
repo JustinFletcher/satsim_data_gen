@@ -482,7 +482,7 @@ def main(unused_argv):
         partition_fn = partition_examples_by_file
     else:
         # Standard randomized split
-        split_dict = {"train": 0.6, "valid": 0.2, "test": 0.2}
+        split_dict = {"train": 0.8, "valid": 0.1, "test": 0.1}
         partition_fn = partition_examples
 
     if FLAGS.multiframe:
