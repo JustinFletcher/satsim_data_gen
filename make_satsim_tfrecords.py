@@ -70,7 +70,7 @@ def _floats_feature(value):
     return tf.train.Feature(float_list=tf.train.FloatList(value=value))
 
 
-def build_satnet_tf_example(example):
+def build_satnet_tf_example(example, pad_for_satsim=False):
 
     (image_path, annotation_path) = example
 
@@ -81,13 +81,18 @@ def build_satnet_tf_example(example):
     annotations = json.load(fp)["data"]
     fp.close()
 
+    if pad_for_satsim:
+        pad_amount = 0.02
+    else:
+        pad_amount = 0.00
+
     sequence = [file.encode() for file in annotations["file"]["sequence"]]
     class_name = [obj["class_name"].encode() for obj in annotations["objects"]]
     class_id = [obj["class_id"] for obj in annotations["objects"]]
-    y_min = [obj["y_min"] - 0.02 for obj in annotations["objects"]]
-    y_max = [obj["y_max"] + 0.02 for obj in annotations["objects"]]
-    x_min = [obj["x_min"] - 0.02 for obj in annotations["objects"]]
-    x_max = [obj["x_max"] + 0.02 for obj in annotations["objects"]]
+    y_min = [obj["y_min"] - pad_amount for obj in annotations["objects"]]
+    y_max = [obj["y_max"] + pad_amount for obj in annotations["objects"]]
+    x_min = [obj["x_min"] - pad_amount for obj in annotations["objects"]]
+    x_max = [obj["x_max"] + pad_amount for obj in annotations["objects"]]
     source = [obj["source"].encode() for obj in annotations["objects"]]
     magnitude = [obj["magnitude"] for obj in annotations["objects"]]
 
@@ -124,7 +129,7 @@ def build_satnet_tf_example(example):
     return(example)
 
 
-def build_satsim_multiframe_tf_example(example_sequence):
+def build_satsim_multiframe_tf_example(example_sequence, pad_for_satsim=False):
     sequence_images = []
     sequence_filenames = []
     sequence_classes = []
@@ -142,11 +147,16 @@ def build_satsim_multiframe_tf_example(example_sequence):
         annotations = json.load(fp)["data"]
         fp.close()
 
+        if pad_for_satsim:
+            pad_amount = 0.02
+        else:
+            pad_amount = 0.00
+
         class_id = [obj["class_id"] for obj in annotations["objects"]]
-        y_min = [obj["y_min"] - 0.02 for obj in annotations["objects"]]
-        y_max = [obj["y_max"] + 0.02 for obj in annotations["objects"]]
-        x_min = [obj["x_min"] - 0.02 for obj in annotations["objects"]]
-        x_max = [obj["x_max"] + 0.02 for obj in annotations["objects"]]
+        y_min = [obj["y_min"] - pad_amount for obj in annotations["objects"]]
+        y_max = [obj["y_max"] + pad_amount for obj in annotations["objects"]]
+        x_min = [obj["x_min"] - pad_amount for obj in annotations["objects"]]
+        x_max = [obj["x_max"] + pad_amount for obj in annotations["objects"]]
 
         dir_name = annotations["file"]["dirname"]
         file_name = annotations["file"]["filename"]
