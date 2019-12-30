@@ -38,9 +38,7 @@
             "sample": "random.choice",
             "choices": [
                 { "exposure": 1.0, "gap": 0.1 },
-                { "exposure": 2.0, "gap": 0.1 },
-                { "exposure": 3.0, "gap": 0.1 },
-                { "exposure": 4.0, "gap": 0.1 }
+                { "exposure": 2.0, "gap": 0.1 }
             ]
         },
         "num_frames": 1
@@ -256,7 +254,7 @@
             "mode": "list",
             "sample": "random.list",
             "length": 
-                { "sample": "random.randint", "low": 2, "high": 5 },
+                { "sample": "random.randint", "low": 99, "high": 100 },
             "list": {
                 "mode": "line",
                 "origin": [
@@ -264,8 +262,8 @@
                     { "sample": "random.uniform", "low": 0.1, "high": 0.9 }
                 ],
                 "velocity": [
-                    { "sample": "random.uniform", "low": -0.5, "high": 0.5 },
-                    { "sample": "random.uniform", "low": -0.5, "high": 0.5 }
+                    { "sample": "random.uniform", "low": -1, "high": -5 },
+                    { "sample": "random.uniform", "low": 1, "high": 2 }
                 ],
                 "mv": 
                     { "sample": "random.uniform", "low": 5.0, "high": 20.0 }
