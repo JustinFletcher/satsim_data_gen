@@ -25,24 +25,20 @@ def build_sensor_config(num_samples, num_frames_per_sample, base_config_dict):
 
     config_dict = base_config_dict
 
-    sim_dict = config_dict['sim']
-    sim_dict["samples"] = num_samples
-    config_dict['sim'] = sim_dict
-
-    fpa_dict = config_dict['fpa']
+    config_dict['sim']["samples"] = num_samples
 
     # Select a FOV for this sensor.
     fov = np.random.uniform(0.3, 1.5)
-    fpa_dict["y_fov"] = fov
-    fpa_dict["x_fov"] = fov
+    config_dict['fpa']["y_fov"] = fov
+    config_dict['fpa']["x_fov"] = fov
 
     # Dark current in photoelectrons. Consider Lognormal around about 1.
-    fpa_dict["dark_current"] = np.random.uniform(0.5, 5)
+    config_dict['fpa']["dark_current"] = np.random.uniform(0.5, 5)
 
     # Gain and bias.
-    fpa_dict["gain"] = np.random.uniform(1.0, 2.0)
-    fpa_dict["bias"] = np.random.uniform(90, 110)
-    fpa_dict["zeropoint"] = np.random.uniform(21.0, 26.0)
+    config_dict['fpa']["gain"] = np.random.uniform(1.0, 2.0)
+    config_dict['fpa']["bias"] = np.random.uniform(90, 110)
+    config_dict['fpa']["zeropoint"] = np.random.uniform(21.0, 26.0)
 
     # fpa_dict = config_dict['fpa']
     # a2d_dict = fpa_dict['a2d']
@@ -51,34 +47,190 @@ def build_sensor_config(num_samples, num_frames_per_sample, base_config_dict):
     a2d_dict["fwc"] = np.random.uniform(190000, 200000)
     a2d_dict["gain"] = np.random.uniform(1.0, 2.0)
     a2d_dict["bias"] = np.random.uniform(9, 11)
-    fpa_dict["a2d"] = a2d_dict
+    config_dict['fpa']["a2d"] = a2d_dict
 
     # Read noise for smae sensor.
     # noise_dict = fpa_dict["noise"]
     noise_dict = dict()
     noise_dict["read"] = np.random.uniform(5, 20)
     noise_dict["electronic"] = np.random.uniform(5, 10)
-    fpa_dict["noise"] = noise_dict
+    config_dict['fpa']["noise"] = noise_dict
 
     # psf_dict = fpa_dict["psf"]
     psf_dict = dict()
     psf_dict["mode"] = "gaussian"
     psf_dict["eod"] = np.random.uniform(0.05, 0.9)
-    fpa_dict["psf"] = psf_dict
+    config_dict['fpa']["psf"] = psf_dict
 
     # time_dict = fpa_dict["time"]
     time_dict = dict()
     time_dict["exposure"] = np.random.uniform(1.0, 2.0)
     time_dict["gap"] = np.random.uniform(0.1, 1)
-    fpa_dict["time"] = time_dict
+    config_dict['fpa']["time"] = time_dict
 
-    fpa_dict["num_frames"] = num_frames_per_sample
-
-    # Set the FPA.
-    config_dict['fpa'] = fpa_dict
+    config_dict['fpa']["num_frames"] = num_frames_per_sample
 
     return(config_dict)
 
+def build_breakup_obs(config_dict):
+
+    config_dict['geometry']['obs'] = dict()
+    config_dict['geometry']['obs']['mode'] = 'list'
+
+    obs_list = list()
+
+    parent_origin = [np.random.uniform(0.4, 0.6), np.random.uniform(0.4, 0.6)]
+    parent_mv = 12
+    ob = {'velocity': [0.01, 0.01],
+          'origin': parent_origin,
+          'mode': 'line',
+          'mv': parent_mv}
+    obs_list.append(ob)
+
+    ejecta = np.random.randint(5, 20)
+
+    for ejectum in range(ejecta):
+
+        ejectum_size_factor = parent_mv + 2 + np.random.poisson(0)
+        speed = 0.1 * np.random.standard_cauchy()
+
+        ob = {'velocity': [speed * np.random.uniform(),
+                           speed * np.random.uniform()],
+              'origin': parent_origin,
+              'mode': 'line',
+              'mv': ejectum_size_factor}
+        obs_list.append(ob)
+
+    config_dict['geometry']['obs']['length'] = ejecta
+
+    config_dict['geometry']['obs']['list'] = obs_list
+
+    return config_dict
+
+def build_deployment_obs(config_dict):
+
+    config_dict['geometry']['obs'] = dict()
+    config_dict['geometry']['obs']['mode'] = 'list'
+
+    obs_list = list()
+
+    parent_origin = [np.random.uniform(0.4, 0.6), np.random.uniform(0.4, 0.6)]
+    parent_mv = 12
+    ob = {'velocity': [0.01,
+                       0.01],
+          'origin': parent_origin,
+          'mode': 'line',
+          'mv': parent_mv}
+    obs_list.append(ob)
+
+    ejecta = 5
+
+    for ejectum in range(ejecta):
+
+        ejectum_size_factor = parent_mv + 2
+        speed = np.min([1.0, np.random.standard_cauchy()])
+
+        ob = {'velocity': [np.abs(speed * np.random.uniform(0.2)),
+                           np.abs(speed * np.random.uniform(0.3))],
+              'origin': parent_origin,
+              'mode': 'line',
+              'mv': ejectum_size_factor}
+        obs_list.append(ob)
+
+    config_dict['geometry']['obs']['length'] = ejecta
+
+    config_dict['geometry']['obs']['list'] = obs_list
+
+    return config_dict
+
+def build_constellation_obs(config_dict):
+
+    config_dict['geometry']['obs'] = dict()
+    config_dict['geometry']['obs']['mode'] = 'list'
+
+    obs_list = list()
+
+    parent_origin = [np.random.uniform(0.4, 0.6), np.random.uniform(0.4, 0.6)]
+    parent_mv = 12
+    parent_velocity = [0.0, 0.0]
+    ob = {'velocity': parent_velocity,
+          'origin': parent_origin,
+          'mode': 'line',
+          'mv': parent_mv}
+    obs_list.append(ob)
+
+    sats = 5
+
+    for sat in range(sats):
+
+        sat_origin = [sum(x) for x in zip(parent_origin, [0.0, 0.03 * (sat + 1)])]
+
+        ob = {'velocity': parent_velocity,
+              'origin': sat_origin,
+              'mode': 'line',
+              'mv': parent_mv}
+        obs_list.append(ob)
+
+    config_dict['geometry']['obs']['length'] = sats
+
+    config_dict['geometry']['obs']['list'] = obs_list
+
+    return config_dict
+
+def build_cso_obs(config_dict):
+
+    config_dict['geometry']['obs'] = dict()
+    config_dict['geometry']['obs']['mode'] = 'list'
+
+    obs_list = list()
+
+    parent_origin = [np.random.uniform(0.4, 0.6), np.random.uniform(0.4, 0.6)]
+    parent_velocity = [0.1, 0.2]
+    parent_mv = 12
+    ob = {'velocity': parent_velocity,
+          'origin': parent_origin,
+          'mode': 'line',
+          'mv': parent_mv}
+    obs_list.append(ob)
+
+    child_origin = [sum(x) for x in zip(parent_origin, [0.03, 0.00])]
+    child_velocity = [sum(x) for x in zip(parent_velocity, [0.00, -0.0])]
+    child_velocity = [-0.6, 0.2]
+    child_mv = parent_mv + 2
+    ob = {'velocity': child_velocity,
+          'origin': child_origin,
+          'mode': 'line',
+          'mv': child_mv}
+    obs_list.append(ob)
+
+    config_dict['geometry']['obs']['length'] = len(obs_list)
+
+    config_dict['geometry']['obs']['list'] = obs_list
+
+    return config_dict
+
+
+def build_static_obs(config_dict):
+
+    config_dict['geometry']['obs'] = dict()
+    config_dict['geometry']['obs']['mode'] = 'list'
+
+    obs_list = list()
+
+    parent_origin = [np.random.uniform(0.4, 0.6), np.random.uniform(0.4, 0.6)]
+    parent_velocity = [0.1, 0.2]
+    parent_mv = 12
+    ob = {'velocity': parent_velocity,
+          'origin': parent_origin,
+          'mode': 'line',
+          'mv': parent_mv}
+    obs_list.append(ob)
+
+    config_dict['geometry']['obs']['length'] = len(obs_list)
+
+    config_dict['geometry']['obs']['list'] = obs_list
+
+    return config_dict
 
 def make_clean_dir(directory):
 
@@ -159,7 +311,7 @@ def populate_needed_samples(needed_samples_dict,
 
                 # ...so stop here to avoid damage.
                 print(sensor_config_file_paths)
-                raise Exception('Found >1 *.json in ' + sensor_dir_path)
+                raise Exception('Found > or < 1 *.json in ' + sensor_dir_path)
 
             # But, if nothing is wrong...
             else:
@@ -226,22 +378,48 @@ def main(**kwargs):
         with open(FLAGS.config_file_path, 'r') as f:
 
             # Read the base config file which randomizes over other properties.
-            base_config_dict = json.load(f)
+            config_dict = json.load(f)
 
-        # Build a new randomized config dict for this sensor;
-        config_dict = build_sensor_config(1,
-                                          FLAGS.num_frames_per_sample,
-                                          base_config_dict)
+        if FLAGS.generate_sensor:
+
+            # Build a new randomized config dict for this sensor;
+            config_dict = build_sensor_config(1,
+                                              FLAGS.num_frames_per_sample,
+                                              config_dict)
+
+        if FLAGS.breakup:
+
+            config_dict = build_breakup_obs(config_dict)
+
+        if FLAGS.cso:
+
+            config_dict = build_cso_obs(config_dict)
+
+        if FLAGS.static_obs:
+
+            config_dict = build_static_obs(config_dict)
+
+        if FLAGS.constellation:
+
+            config_dict = build_constellation_obs(config_dict)
 
         # Create a directory for this sensors examples; first get existing.
         sensor_dirs = glob.glob(os.path.join(FLAGS.data_bank_dir, "sensor_*"))
 
-        # Then take the suffix post "sensor_", int it, max it, and add 1.
-        sensor_nums = [int(s.split("sensor_")[-1]) for s in sensor_dirs]
-        sensor_num = np.max(sensor_nums) + 1
+        # If no sensors were found, make a dir for the first.
+        if not sensor_dirs:
 
-        # construct the new sensor name, and make a dir name to hold its data.
-        sensor_name_str = "sensor_" + str(sensor_num)
+            sensor_num = 0
+            sensor_name_str = "sensor_0"
+
+        else:
+            # Then take the suffix post "sensor_", int it, max it, and add 1.
+            sensor_nums = [int(s.split("sensor_")[-1]) for s in sensor_dirs]
+            sensor_num = np.max(sensor_nums) + 1
+
+            # construct the new sensor name, and make a dir name to hold its data.
+            sensor_name_str = "sensor_" + str(sensor_num)
+
         sensor_dir_path = os.path.join(FLAGS.data_bank_dir, sensor_name_str)
 
         print("Making: " + sensor_name_str)
@@ -266,12 +444,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--data_bank_dir', type=str,
-                        default="/home/jfletcher/data/satnet_v2_sensor_generalization/sensor_bank_debug/",
+                        default=".\\temp",
                         help='Path to SatSim sensor bank.')
 
     # Set arguments and their default values
     parser.add_argument('--config_file_path', type=str,
-                        default="/home/jfletcher/research/satsim_data_gen/satsim.json",
+                        default=".\\satsim.json",
                         help='Path to the JSON config for SatSim.')
 
     parser.add_argument('--num_samples', type=int,
@@ -279,7 +457,7 @@ if __name__ == '__main__':
                         help='The number of samples from each sensor.')
 
     parser.add_argument('--num_frames_per_sample', type=int,
-                        default=6,
+                        default=20,
                         help='The number of frames to use in each sequence.')
 
     parser.add_argument('--device', type=int,
@@ -297,6 +475,26 @@ if __name__ == '__main__':
     parser.add_argument('--debug_satsim', action='store_true',
                         default=False,
                         help='If true, write annotated JPEGs to disk.')
+
+    parser.add_argument('--breakup', action='store_true',
+                        default=False,
+                        help='If provided, simulate breakups.')
+
+    parser.add_argument('--cso', action='store_true',
+                        default=False,
+                        help='If provided, simulate a CSO.')
+
+    parser.add_argument('--static_obs', action='store_true',
+                        default=False,
+                        help='If provided, use only static obs.')
+
+    parser.add_argument('--constellation', action='store_true',
+                        default=False,
+                        help='If provided, use constellation obs.')
+
+    parser.add_argument('--generate_sensor', action='store_true',
+                        default=False,
+                        help='If provided, procedurally generate a sensor.')
 
     FLAGS = parser.parse_args()
 
